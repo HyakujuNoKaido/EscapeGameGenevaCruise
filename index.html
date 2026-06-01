@@ -1,0 +1,316 @@
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <!-- Meta viewport stricte pour empêcher le zoom non désiré sur iPhone et figer l'écran -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Terminal Hacking - Tour de Bel-Air</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --neon-green: #00FF00;
+            --neon-red: #FF0000;
+            --bg-color: #050505;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            background-color: var(--bg-color);
+            color: var(--neon-green);
+            font-family: 'VT323', monospace;
+            font-size: 20px;
+            overflow: hidden; /* Empêche le scroll natif */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Effet CRT et Scanlines --- */
+        .crt::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            z-index: 50;
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        .crt::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: rgba(0, 255, 0, 0.03);
+            opacity: 0;
+            z-index: 50;
+            pointer-events: none;
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.02; }
+            50% { opacity: 0.05; }
+            100% { opacity: 0.02; }
+        }
+
+        /* --- Conteneur Principal --- */
+        #terminal-container {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- Typographie et Messages --- */
+        p {
+            margin-bottom: 15px;
+            line-height: 1.4;
+            text-shadow: 0 0 5px var(--neon-green);
+            white-space: pre-wrap; /* Conserve les sauts de ligne du JS */
+        }
+
+        .error {
+            color: var(--neon-red);
+            text-shadow: 0 0 5px var(--neon-red);
+            animation: blink 1s infinite;
+        }
+
+        .success-code {
+            font-size: 14px;
+            opacity: 0.8;
+            overflow-wrap: anywhere;
+        }
+
+        .victory-msg {
+            font-size: 28px;
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px solid var(--neon-green);
+            background: rgba(0, 255, 0, 0.1);
+            animation: pulse 2s infinite;
+        }
+
+        /* --- Formulaire et Input --- */
+        #interactive-area {
+            display: none; /* Masqué jusqu'à la fin de l'animation d'intro */
+            margin-top: 20px;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .prompt-symbol {
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            background: transparent;
+            border: none;
+            color: var(--neon-green);
+            font-family: 'VT323', monospace;
+            /* 16px minimum est crucial sur iOS pour éviter le zoom auto au focus. Ici 20px pour plus de lisibilité. */
+            font-size: 20px; 
+            outline: none;
+            flex: 1;
+            text-shadow: 0 0 5px var(--neon-green);
+            caret-color: var(--neon-green);
+            text-transform: uppercase;
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(0, 255, 0, 0.3);
+        }
+
+        button {
+            background: var(--neon-green);
+            color: var(--bg-color);
+            border: none;
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 0 10px var(--neon-green);
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.95);
+            background: #00cc00;
+        }
+
+        /* --- Animations --- */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 5px var(--neon-green); }
+            50% { box-shadow: 0 0 20px var(--neon-green); }
+            100% { box-shadow: 0 0 5px var(--neon-green); }
+        }
+
+        .typing-cursor::after {
+            content: '█';
+            animation: blink 1s infinite;
+        }
+    </style>
+</head>
+<body class="crt">
+
+    <div id="terminal-container">
+        <div id="output"></div>
+        
+        <form id="interactive-area" onsubmit="verifierReponse(event)">
+            <p id="riddle-text"></p>
+            <div class="input-group">
+                <span class="prompt-symbol">root@mainframe:~#</span>
+                <input type="text" id="answer-input" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="TAPER ICI...">
+            </div>
+            <button type="submit">Valider</button>
+            <p id="feedback-msg"></p>
+        </form>
+    </div>
+
+    <script>
+        // --- Configuration des textes ---
+        const introText = "CONNEXION AU MAINFRAME DES VEILLEURS...\nTOUR DE BEL-AIR. IDENTIFICATION REQUISE.\nRÉPONDEZ À L'ÉNIGME POUR OBTENIR LA CLÉ D'ACCÈS.";
+        const riddleText = "Je suis l'année où cette tour de béton a touché le ciel pour la première fois. Qui suis-je ?";
+        const correctAnswer = "1591"; // La logique de validation traitera tout en minuscules/sans espaces
+        
+        // --- Éléments du DOM ---
+        const outputDiv = document.getElementById('output');
+        const interactiveArea = document.getElementById('interactive-area');
+        const riddleP = document.getElementById('riddle-text');
+        const answerInput = document.getElementById('answer-input');
+        const feedbackMsg = document.getElementById('feedback-msg');
+        const terminalContainer = document.getElementById('terminal-container');
+
+        // --- Mécanique d'écriture (Machine à écrire) ---
+        async function typeWriter(text, element, speed = 40) {
+            element.classList.add('typing-cursor');
+            for (let i = 0; i < text.length; i++) {
+                element.innerHTML += text.charAt(i) === '\n' ? '<br>' : text.charAt(i);
+                terminalContainer.scrollTop = terminalContainer.scrollHeight;
+                await new Promise(resolve => setTimeout(resolve, speed));
+            }
+            element.classList.remove('typing-cursor');
+        }
+
+        // --- Séquence de démarrage ---
+        async function initSequence() {
+            const introP = document.createElement('p');
+            outputDiv.appendChild(introP);
+            await typeWriter(introText, introP, 50);
+            
+            // Petite pause avant d'afficher l'énigme
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            interactiveArea.style.display = 'flex';
+            await typeWriter(riddleText, riddleP, 40);
+            
+            // Focus automatique sur l'input une fois le texte terminé
+            answerInput.focus();
+        }
+
+        // --- Validation de la réponse ---
+        function verifierReponse(e) {
+            e.preventDefault(); // Empêche le rechargement de la page
+            
+            // Nettoyage de l'input : insensible à la casse et suppression des espaces inutiles
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            
+            if (userAnswer === correctAnswer) {
+                declencherVictoire();
+            } else {
+                afficherErreur();
+            }
+        }
+
+        function afficherErreur() {
+            feedbackMsg.className = 'error';
+            feedbackMsg.innerHTML = 'ACCÈS REFUSÉ. IDENTIFIANT INCORRECT.';
+            answerInput.value = ''; // On vide le champ
+            answerInput.focus();
+            
+            // Efface le message d'erreur après 2.5 secondes
+            setTimeout(() => {
+                feedbackMsg.innerHTML = '';
+            }, 2500);
+        }
+
+        // --- Séquence de Victoire (Hack réussi) ---
+        async function declencherVictoire() {
+            // Masquer l'interface de saisie
+            interactiveArea.style.display = 'none';
+            outputDiv.innerHTML = ''; // Nettoyer l'écran
+            
+            // Changement de couleur d'ambiance (vert -> bleu cyan pour marquer le déverrouillage)
+            document.documentElement.style.setProperty('--neon-green', '#00FFFF');
+            
+            // Effet "Matrix" / Lignes de code qui défilent
+            const codeLines = 25;
+            for(let i=0; i<codeLines; i++) {
+                const p = document.createElement('p');
+                p.className = 'success-code';
+                p.innerText = genererLigneHexa();
+                outputDiv.appendChild(p);
+                terminalContainer.scrollTop = terminalContainer.scrollHeight;
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+
+            // Message de victoire final
+            await new Promise(resolve => setTimeout(resolve, 500));
+            const victoryDiv = document.createElement('div');
+            victoryDiv.className = 'victory-msg';
+            victoryDiv.innerHTML = 'ACCÈS AUTORISÉ<br><br>VOTRE CLÉ DE DÉVERROUILLAGE EST :<br><strong>ROYAUME_OS</strong>';
+            outputDiv.appendChild(victoryDiv);
+            terminalContainer.scrollTop = terminalContainer.scrollHeight;
+        }
+
+        // --- Utilitaire : Générateur de fausses lignes de code ---
+        function genererLigneHexa() {
+            const chars = '0123456789ABCDEF!@#$%^&*()';
+            let line = 'BYPASSING FIREWALL... [OK] 0x';
+            for(let i=0; i<30; i++) {
+                line += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return line;
+        }
+
+        // Lancement au chargement
+        window.onload = initSequence;
+    </script>
+</body>
+</html>```
+
+```
