@@ -1,316 +1,2165 @@
-```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <!-- Meta viewport stricte pour empêcher le zoom non désiré sur iPhone et figer l'écran -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Terminal Hacking - Tour de Molard</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Projet Éclipse — Genève</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=UnifrakturCook:wght@700&family=Cinzel:wght@500;700&family=Limelight&family=Major+Mono+Display&family=Playfair+Display:wght@700&family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 
     <style>
+        /* =================== VARIABLES PAR ÈRE =================== */
         :root {
-            --neon-green: #00FF00;
-            --neon-red: #FF0000;
-            --bg-color: #050505;
+            --bg-color: #0a0a0a; --bg-deep: #050505;
+            --accent: #c9a14a; --gold-soft: #e6c878;
+            --text: #e6dcc8; --muted: #8a8377;
+            --card-bg: rgba(20, 14, 8, 0.7);
+            --border: rgba(201, 161, 74, 0.35);
+            --success: #6fbf73; --danger: #b53d2a;
+            --font-display: 'Cormorant Garamond', 'Cinzel', serif;
+            --font-body: 'Cormorant Garamond', serif;
+            --font-mono: 'Cormorant Garamond', serif;
+            --radius: 2px;
+            --glow: 0 0 30px rgba(201, 161, 74, 0.15);
+        }
+        body[data-era="baroque"] {
+            --bg-color: #1a0f06; --bg-deep: #0d0703;
+            --accent: #d4af5c; --text: #efe2c2; --muted: #8a7d5e;
+            --card-bg: rgba(28, 18, 8, 0.85);
+            --border: rgba(212, 175, 92, 0.4);
+            --font-display: 'UnifrakturCook', 'Cinzel', serif;
+            --glow: 0 0 40px rgba(212, 175, 92, 0.12);
+        }
+        body[data-era="industrial"] {
+            --bg-color: #14181d; --bg-deep: #0a0d10;
+            --accent: #c89243; --text: #e0d6c5; --muted: #8b8275;
+            --card-bg: rgba(20, 24, 30, 0.85);
+            --border: rgba(184, 115, 51, 0.45);
+            --font-display: 'Limelight', 'Playfair Display', serif;
+            --font-body: 'Playfair Display', serif;
+            --font-mono: 'Major Mono Display', monospace;
+            --radius: 0px;
+            --glow: 0 0 30px rgba(184, 115, 51, 0.18);
+        }
+        body[data-era="cyber"] {
+            --bg-color: #050810; --bg-deep: #02030a;
+            --accent: #00f0ff; --text: #d0fff8; --muted: #5c6e7a;
+            --card-bg: rgba(8, 14, 26, 0.75);
+            --border: rgba(0, 240, 255, 0.45);
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'Space Grotesk', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --radius: 0px;
+            --glow: 0 0 40px rgba(0, 240, 255, 0.35), 0 0 80px rgba(255, 43, 214, 0.15);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        /* =================== BASE & BACKGROUND =================== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            min-height: 100vh;
+            background: var(--bg-deep); color: var(--text);
+            font-family: var(--font-body); line-height: 1.55;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 1.2s ease, color 1.2s ease;
         }
-
-        body, html {
-            height: 100%;
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            pointer-events: none; z-index: 0;
+            transition: opacity 1.2s ease;
             background-color: var(--bg-color);
-            color: var(--neon-green);
-            font-family: 'VT323', monospace;
-            font-size: 20px;
-            overflow: hidden; /* Empêche le scroll natif */
-            display: flex;
-            flex-direction: column;
+        }
+        body[data-era="baroque"]::before {
+            background:
+                radial-gradient(ellipse at 20% 10%, rgba(212, 175, 92, 0.10), transparent 50%),
+                radial-gradient(ellipse at 80% 90%, rgba(120, 50, 30, 0.12), transparent 55%),
+                radial-gradient(ellipse at 50% 50%, rgba(40, 20, 10, 0.4), transparent 75%),
+                var(--bg-color);
+        }
+        body[data-era="industrial"]::before {
+            background:
+                linear-gradient(135deg, rgba(184, 115, 51, 0.06) 0%, transparent 50%),
+                repeating-linear-gradient(45deg, transparent 0 18px, rgba(255,255,255,0.012) 18px 19px),
+                var(--bg-color);
+        }
+        body[data-era="cyber"]::before {
+            background:
+                radial-gradient(ellipse at 30% 20%, rgba(0, 240, 255, 0.10), transparent 55%),
+                radial-gradient(ellipse at 80% 80%, rgba(255, 43, 214, 0.10), transparent 55%),
+                var(--bg-color);
         }
 
-        /* --- Effet CRT et Scanlines --- */
-        .crt::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-            z-index: 50;
-            background-size: 100% 4px;
-            pointer-events: none;
+        /* =================== TEXTURES MATÉRIELLES =================== */
+        #bg-texture {
+            position: fixed; inset: 0; pointer-events: none; z-index: 1;
+            opacity: 0; transition: opacity 1.2s ease, background 1.2s ease;
+            mix-blend-mode: overlay; background-size: cover;
+        }
+        body[data-step="1"] #bg-texture {
+            opacity: 0.35;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.03' numOctaves='4'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+        }
+        body[data-step="2"] #bg-texture {
+            opacity: 0.25;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.01 0.15' numOctaves='2'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+        }
+        body[data-step="3"] #bg-texture {
+            opacity: 0.15; mix-blend-mode: normal;
+            background: repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 2px, transparent 2px, transparent 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.15) 0, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 6px);
+        }
+        body[data-step="4"] #bg-texture {
+            opacity: 0.1; mix-blend-mode: normal;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'><rect x='2' y='2' width='26' height='26' rx='6' fill='none' stroke='white' stroke-width='2'/><rect x='32' y='32' width='26' height='26' rx='6' fill='none' stroke='white' stroke-width='2'/></svg>");
+            background-size: 60px 60px;
+        }
+        body[data-step="5"] #bg-texture {
+            opacity: 0.12; mix-blend-mode: normal;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><circle cx='100' cy='100' r='40' stroke='white' stroke-width='3' fill='none'/><circle cx='100' cy='100' r='80' stroke='white' stroke-width='1.5' fill='none'/></svg>");
+            background-size: 150px 150px; background-position: center;
+        }
+        body[data-step="6"] #bg-texture {
+            opacity: 0.25;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+        }
+        body[data-step="7"] #bg-texture {
+            opacity: 0.08; mix-blend-mode: normal;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60'><path d='M30 10 C 45 10 50 25 50 30 C 50 35 45 50 30 50 C 15 50 10 35 10 30 C 10 25 15 10 30 10 Z' fill='none' stroke='white' stroke-width='1.5'/><path d='M30 10 L 30 50' stroke='white' stroke-width='1.5'/></svg>");
+            background-size: 80px 80px;
+        }
+        body[data-step="8"] #bg-texture {
+            opacity: 0.15; mix-blend-mode: normal;
+            background: repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0, rgba(255,255,255,0.06) 20px, transparent 20px, transparent 60px);
+            background-size: 6px 120px;
+        }
+        body[data-step="9"] #bg-texture {
+            opacity: 0.25;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.006' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
         }
 
-        .crt::after {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            background: rgba(0, 255, 0, 0.03);
-            opacity: 0;
-            z-index: 50;
-            pointer-events: none;
-            animation: flicker 0.15s infinite;
+        #app {
+            position: relative; z-index: 2;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            padding: 28px 22px 120px;
+            max-width: 640px; margin: 0 auto;
         }
 
-        @keyframes flicker {
-            0% { opacity: 0.02; }
-            50% { opacity: 0.05; }
-            100% { opacity: 0.02; }
+        /* =================== TYPO =================== */
+        h1 {
+            font-family: var(--font-display); color: var(--accent);
+            margin-bottom: 18px; font-size: 2rem;
+            letter-spacing: 0.02em; display: flex; align-items: center; justify-content: center; gap: 12px;
+            user-select: none; -webkit-user-select: none;
+            line-height: 1.1; text-shadow: var(--glow);
+        }
+        .title-icon { width: 36px; height: 36px; opacity: 0.85; display: inline-block; flex-shrink: 0; }
+        .title-icon svg { width: 100%; height: 100%; stroke: var(--accent); }
+        
+        body[data-era="baroque"] h1 { font-size: 2.2rem; letter-spacing: 0.04em; }
+        body[data-era="industrial"] h1 { font-size: 1.6rem; text-transform: uppercase; letter-spacing: 0.15em; }
+        body[data-era="cyber"] h1 {
+            font-size: 1.6rem; text-transform: uppercase; letter-spacing: 0.18em;
+            text-shadow: 0 0 8px var(--accent), 0 0 22px rgba(0,240,255,0.5);
+        }
+        body[data-era="cyber"] h1.glitch { animation: glitch 6s infinite alternate; }
+        @keyframes glitch {
+            0%, 96% { transform: translate(0); }
+            97% { transform: translate(-2px, 1px); text-shadow: -2px 0 var(--danger), 2px 0 var(--accent); }
+            98% { transform: translate(2px, -1px); text-shadow: 2px 0 var(--danger), -2px 0 var(--accent); }
+            99%, 100% { transform: translate(0); text-shadow: 0 0 8px var(--accent), 0 0 22px rgba(0,240,255,0.5); }
+        }
+        h2, h3 { font-family: var(--font-display); color: var(--accent); margin-bottom: 12px; }
+        p { margin-bottom: 22px; font-size: 1.12rem; color: var(--text); }
+        body[data-era="baroque"] p { font-style: italic; font-size: 1.18rem; }
+        body[data-era="cyber"] p  { font-family: var(--font-body); font-size: 1.02rem; }
+        .label {
+            font-family: var(--font-mono); font-size: 0.72rem;
+            letter-spacing: 0.25em; text-transform: uppercase;
+            color: var(--muted); margin-bottom: 8px;
         }
 
-        /* --- Conteneur Principal --- */
-        #terminal-container {
-            flex: 1;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
+        /* =================== ORNEMENTS =================== */
+        .ornament {
+            text-align: center; margin: 12px 0 22px;
+            color: var(--accent); font-family: var(--font-display);
+            font-size: 1.4rem; opacity: 0.85; letter-spacing: 0.4em;
+        }
+        body[data-era="baroque"] .ornament::before  { content: '❦ ✦ ❦'; }
+        body[data-era="industrial"] .ornament::before { content: '▮ ▬ ▮ ▬ ▮'; letter-spacing: 0.5em; }
+        body[data-era="cyber"] .ornament::before      { content: '[ // ▮ ▮ ▮ // ]'; font-family: var(--font-mono); letter-spacing: 0.15em; font-size: 1rem; }
+
+        /* =================== TOPBAR & PROGRESS =================== */
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px; opacity: 0.85; gap: 10px;
+        }
+        .topbar .meta {
+            font-family: var(--font-mono); font-size: 0.72rem;
+            letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+        }
+        .btn-pause {
+            width: auto; padding: 6px 10px; font-size: 0.65rem;
+            background: transparent; color: var(--muted);
+            border: 1px solid var(--border); letter-spacing: 0.15em;
+        }
+        .btn-pause:hover:not(:disabled) { color: var(--accent); border-color: var(--accent); }
+
+        .progress { display: flex; gap: 6px; margin: 8px 0 26px; }
+        .progress .dot {
+            flex: 1; height: 4px; background: rgba(255,255,255,0.08);
+            border-radius: 2px; overflow: hidden; position: relative;
+        }
+        .progress .dot.done { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+        .progress .dot.current::after {
+            content: ''; position: absolute; inset: 0;
+            background: var(--accent); opacity: 0.6;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+        @keyframes pulse { 50% { opacity: 0.2; } }
+
+        /* =================== CARTES & WATERMARK =================== */
+        .card-container {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            transform: rotateY(var(--tilt-y, 0deg)) rotateX(var(--tilt-x, 0deg));
+            transition: transform 0.15s ease-out;
+            will-change: transform;
+            margin-bottom: 18px;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
             position: relative;
-            z-index: 10;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            overflow: hidden;
+        }
+        body[data-era="baroque"] .card {
+            border: 1px double var(--border);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.4), 0 0 0 4px rgba(0,0,0,0.4), 0 0 0 5px var(--border);
+        }
+        body[data-era="industrial"] .card {
+            border-left: 4px solid var(--accent);
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+        }
+        body[data-era="cyber"] .card {
+            border: 1px solid var(--border);
+            clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+            box-shadow: var(--glow);
+        }
+        
+        .location-watermark {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 160px; height: 160px;
+            opacity: 0.04; pointer-events: none; z-index: 0;
+        }
+        .location-watermark svg { width: 100%; height: 100%; stroke: var(--accent); }
+        .card > *:not(.location-watermark) { position: relative; z-index: 1; }
+
+        .shake { animation: shake 0.4s ease; }
+        @keyframes shake {
+            10%,90% { transform: translateX(-2px); }
+            20%,80% { transform: translateX(4px); }
+            30%,50%,70% { transform: translateX(-8px); }
+            40%,60% { transform: translateX(8px); }
         }
 
-        /* --- Typographie et Messages --- */
-        p {
-            margin-bottom: 15px;
-            line-height: 1.4;
-            text-shadow: 0 0 5px var(--neon-green);
-            white-space: pre-wrap; /* Conserve les sauts de ligne du JS */
-        }
-
-        .error {
-            color: var(--neon-red);
-            text-shadow: 0 0 5px var(--neon-red);
-            animation: blink 1s infinite;
-        }
-
-        .success-code {
-            font-size: 14px;
-            opacity: 0.8;
-            overflow-wrap: anywhere;
-        }
-
-        .victory-msg {
-            font-size: 28px;
+        /* =================== INPUTS =================== */
+        input[type="text"], textarea {
+            width: 100%; padding: 16px 18px;
+            background: rgba(0,0,0,0.45);
+            border: 1px solid var(--border); color: var(--text);
+            font-family: var(--font-mono); font-size: 1.15rem;
+            border-radius: var(--radius); outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
             text-align: center;
-            margin-top: 30px;
-            padding: 20px;
-            border: 2px solid var(--neon-green);
-            background: rgba(0, 255, 0, 0.1);
-            animation: pulse 2s infinite;
         }
-
-        /* --- Formulaire et Input --- */
-        #interactive-area {
-            display: none; /* Masqué jusqu'à la fin de l'animation d'intro */
-            margin-top: 20px;
-            flex-direction: column;
-            gap: 15px;
+        textarea { resize: vertical; min-height: 80px; text-align: left; font-size: 1rem; }
+        input[type="text"]:focus, textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent), var(--glow);
         }
+        input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.65; }
 
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .prompt-symbol {
-            font-weight: bold;
-        }
-
-        input[type="text"] {
-            background: transparent;
-            border: none;
-            color: var(--neon-green);
-            font-family: 'VT323', monospace;
-            /* 16px minimum est crucial sur iOS pour éviter le zoom auto au focus. Ici 20px pour plus de lisibilité. */
-            font-size: 20px; 
-            outline: none;
-            flex: 1;
-            text-shadow: 0 0 5px var(--neon-green);
-            caret-color: var(--neon-green);
-            text-transform: uppercase;
-        }
-
-        input[type="text"]::placeholder {
-            color: rgba(0, 255, 0, 0.3);
-        }
-
+        /* =================== BOUTONS =================== */
         button {
-            background: var(--neon-green);
-            color: var(--bg-color);
-            border: none;
-            font-family: 'VT323', monospace;
-            font-size: 18px;
-            padding: 8px 16px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 0 10px var(--neon-green);
+            width: 100%; background: var(--accent); color: var(--bg-deep);
+            border: none; padding: 18px 22px;
+            font-family: var(--font-display); font-size: 1.05rem;
+            font-weight: 700; letter-spacing: 0.15em;
             text-transform: uppercase;
-            transition: all 0.2s;
+            border-radius: var(--radius); cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.25s, background 0.25s, opacity 0.2s;
+            position: relative;
+        }
+        button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--glow); }
+        button:active:not(:disabled) { transform: translateY(1px); }
+        button:disabled { background: rgba(255,255,255,0.07); color: var(--muted); cursor: not-allowed; }
+
+        body[data-era="cyber"] button:not(:disabled):not(.btn-dev) {
+            background: transparent; color: var(--accent);
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 12px rgba(0,240,255,0.25);
+            text-shadow: 0 0 6px var(--accent);
+        }
+        body[data-era="cyber"] button:hover:not(:disabled):not(.btn-dev) {
+            background: rgba(0,240,255,0.08);
+            box-shadow: 0 0 20px var(--accent), inset 0 0 16px rgba(0,240,255,0.15);
+        }
+        .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+        .btn-dev {
+            background: #ffd54a; color: #1a1a1a;
+            margin-top: 14px; border: 1px dashed #000; font-size: 0.9rem;
+        }
+        .btn-danger {
+            background: transparent; border: 1px solid var(--danger);
+            color: #ff7a66; margin-top: 22px;
+        }
+        .btn-success { background: var(--success); color: #061; }
+
+        /* =================== ACTION FIXE =================== */
+        .bottom-action {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
+            background: linear-gradient(to top, var(--bg-deep) 65%, transparent);
+            z-index: 30;
+            display: flex; flex-direction: column; gap: 10px;
+            max-width: 640px; margin: 0 auto;
         }
 
-        button:active {
-            transform: scale(0.95);
-            background: #00cc00;
+        /* =================== GPS TRACKER =================== */
+        .tracker {
+            text-align: center; padding: 36px 18px;
+            border: 1px dashed var(--border); background: var(--card-bg);
+            border-radius: var(--radius); margin-bottom: 0;
+            position: relative; overflow: hidden;
+        }
+        body[data-era="cyber"] .tracker { border-style: solid; }
+        .tracker .label-dist {
+            font-family: var(--font-mono); font-size: 0.75rem;
+            letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted);
+        }
+        .tracker .distance {
+            font-family: var(--font-mono); font-size: 3.6rem;
+            color: var(--accent); font-weight: 700;
+            margin: 14px 0; text-shadow: var(--glow);
+        }
+        body[data-era="baroque"] .tracker .distance { font-family: var(--font-display); }
+        .tracker .compass-ring {
+            margin: 14px auto; width: 96px; height: 96px;
+            border-radius: 50%; border: 1px solid var(--border);
+            position: relative; display: flex; align-items: center; justify-content: center;
+        }
+        .compass-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+        .tracker .compass-ring .dot-inner {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 12px var(--accent); z-index: 2;
+        }
+        .accuracy { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); letter-spacing: 0.15em; margin-top: 6px; }
+
+        /* =================== HINTS =================== */
+        .hint-card {
+            background: rgba(0,0,0,0.35);
+            border-left: 3px solid var(--accent);
+            padding: 14px 16px;
+            border-radius: var(--radius);
+            margin-bottom: 12px;
+            animation: hintReveal 0.6s ease forwards;
+            opacity: 0;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        @keyframes hintReveal {
+            from { opacity: 0; transform: translateX(-12px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .hint-card.exit { opacity: 0 !important; transform: translateX(-12px) !important; }
+        .hint-card .hint-label {
+            font-family: var(--font-mono); font-size: 0.7rem;
+            letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 6px;
+        }
+        .hint-card.custom {
+            border-left-color: var(--gold-soft);
+            background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(212,175,92,0.08));
         }
 
-        /* --- Animations --- */
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
+        /* =================== GM =================== */
+        .gm-card { margin-bottom: 14px; padding: 16px 18px; }
+        .gm-card label, .gm-card .lbl {
+            display: block; font-family: var(--font-mono);
+            color: var(--muted); font-size: 0.72rem;
+            letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px;
+        }
+        .gm-card .data { color: var(--text); font-size: 1rem; }
+        .gm-card .answer {
+            color: var(--accent); font-family: var(--font-mono);
+            font-weight: 700; font-size: 1.3rem; letter-spacing: 0.05em;
+        }
+        .gm-status-badge {
+            display: inline-block; margin-top: 8px;
+            padding: 4px 10px; font-family: var(--font-mono);
+            font-size: 0.7rem; letter-spacing: 0.15em;
+            text-transform: uppercase; color: var(--bg-deep);
+            background: var(--accent); border-radius: 100px;
+        }
+        .gm-hint-row {
+            display: flex; align-items: stretch; gap: 10px;
+            margin-bottom: 10px; padding: 12px;
+            background: rgba(0,0,0,0.3); border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+        .gm-hint-row .hint-content { flex: 1; font-size: 0.92rem; line-height: 1.4; color: var(--text); }
+        .gm-hint-row .hint-content .lvl {
+            font-family: var(--font-mono); font-size: 0.65rem;
+            letter-spacing: 0.2em; color: var(--muted);
+            text-transform: uppercase; margin-bottom: 4px;
+        }
+        .gm-hint-row button { width: auto; padding: 10px 16px; font-size: 0.78rem; letter-spacing: 0.1em; }
+        .gm-hint-row.released { border-color: var(--success); background: rgba(111, 191, 115, 0.08); }
+        .gm-hint-row.released .lvl { color: var(--success); }
+        .btn-gm-action {
+            background: transparent; color: var(--text);
+            border: 1px solid var(--border); margin-bottom: 10px;
+            font-size: 0.85rem;
+        }
+        .btn-gm-action.highlight { border-color: var(--accent); color: var(--accent); box-shadow: var(--glow); }
+
+        .team-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; border: 1px solid var(--border);
+            background: rgba(0,0,0,0.25); border-radius: var(--radius);
+            margin-bottom: 8px; cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .team-row:hover { border-color: var(--accent); background: rgba(184, 115, 51, 0.1); }
+        .team-row.active { border-color: var(--accent); background: rgba(184, 115, 51, 0.15); }
+        .team-row .team-name { font-family: var(--font-mono); font-size: 0.95rem; color: var(--text); }
+        .team-row .team-state { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; }
+
+        /* =================== OVERLAYS =================== */
+        .overlay {
+            position: fixed; inset: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg-deep);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+        .overlay.show { opacity: 1; pointer-events: all; }
+
+        #successOverlay { flex-direction: column; }
+        #successOverlay .success-inner {
+            text-align: center; padding: 30px;
+            transform: scale(0.85);
+            transition: transform 0.6s cubic-bezier(.2,.9,.3,1.3);
+        }
+        #successOverlay.show .success-inner { transform: scale(1); }
+        #successOverlay h2 {
+            font-family: var(--font-display); font-size: 2.2rem;
+            color: var(--accent); margin-top: 24px;
+            letter-spacing: 0.06em; text-shadow: var(--glow);
+            animation: titleRise 0.8s ease both 0.2s;
+        }
+        #successOverlay p {
+            color: var(--text); font-size: 1.05rem;
+            opacity: 0.85; margin-top: 8px;
+            animation: titleRise 0.8s ease both 0.4s;
+        }
+        @keyframes titleRise {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 5px var(--neon-green); }
-            50% { box-shadow: 0 0 20px var(--neon-green); }
-            100% { box-shadow: 0 0 5px var(--neon-green); }
+        /* ICÔNES DE SUCCÈS PAR ÈRE */
+        .success-icon-wrap {
+            width: 120px; height: 120px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+        .success-icon-wrap::before {
+            content: ''; position: absolute; inset: 0;
+            border-radius: 50%; border: 1px solid var(--accent);
+            opacity: 0.4; animation: ringExpand 1.4s ease-out forwards;
+        }
+        @keyframes ringExpand {
+            from { transform: scale(0.4); opacity: 0.8; }
+            to   { transform: scale(1.6); opacity: 0; }
+        }
+        .seal-svg { width: 110px; height: 110px; animation: sealPress 0.9s cubic-bezier(.2,.9,.2,1.4) both; }
+        @keyframes sealPress {
+            0%   { transform: scale(0) rotate(-30deg); opacity: 0; }
+            60%  { transform: scale(1.2) rotate(8deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        .gear-svg { width: 110px; height: 110px; animation: gearSpin 1.2s ease-out both; }
+        @keyframes gearSpin {
+            0%   { transform: scale(0.4) rotate(-180deg); opacity: 0; }
+            60%  { transform: scale(1.1) rotate(20deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        .ok-svg { width: 130px; height: 60px; animation: okBoot 0.6s steps(6) both; }
+        @keyframes okBoot {
+            0% { opacity: 0; transform: translateX(-12px); }
+            50% { opacity: 1; transform: translateX(6px); }
+            100% { transform: translateX(0); }
+        }
+        .ok-svg text {
+            font-family: 'JetBrains Mono', monospace; font-weight: 700;
+            font-size: 28px; fill: var(--accent);
+            text-shadow: 0 0 8px var(--accent);
         }
 
-        .typing-cursor::after {
-            content: '█';
-            animation: blink 1s infinite;
+        #particleCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 99; }
+
+        #eraTransition {
+            position: fixed; inset: 0; z-index: 200;
+            background: var(--bg-deep);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.6s ease;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #eraTransition.show { opacity: 1; pointer-events: all; }
+        #eraTransition .era-line {
+            width: 0%; height: 1px; background: var(--accent);
+            box-shadow: var(--glow);
+            transition: width 1.4s cubic-bezier(.6,0,.4,1);
+            z-index: 3;
+        }
+        #eraTransition.show .era-line { width: 80%; }
+        #eraTransition .era-text {
+            margin-top: 24px; font-family: var(--font-display);
+            letter-spacing: 0.35em; text-transform: uppercase;
+            font-size: 1.1rem; color: var(--accent);
+            text-shadow: var(--glow);
+            opacity: 0;
+            transition: opacity 0.6s ease 0.5s;
+            z-index: 3;
+        }
+        #eraTransition.show .era-text { opacity: 1; }
+
+        #eraTransition .ash {
+            position: absolute; top: -20px;
+            width: 4px; height: 4px;
+            background: var(--accent); opacity: 0;
+            border-radius: 50%; z-index: 2;
+            box-shadow: 0 0 6px var(--accent);
+        }
+        #eraTransition[data-mode="ash"].show .ash { animation: ashFall 2.2s ease-in forwards; }
+        @keyframes ashFall {
+            0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
+            10%  { opacity: 1; }
+            100% { opacity: 0; transform: translateY(110vh) rotate(720deg); }
+        }
+        #eraTransition .pixel {
+            position: absolute; width: 22px; height: 22px;
+            background: var(--accent); opacity: 0; z-index: 2;
+            mix-blend-mode: screen;
+        }
+        #eraTransition[data-mode="pixel"].show .pixel { animation: pixelPop 1.6s ease-out forwards; }
+        @keyframes pixelPop {
+            0%   { opacity: 0; transform: scale(0); }
+            50%  { opacity: 0.8; transform: scale(1.2); }
+            100% { opacity: 0; transform: scale(0.5); }
+        }
+
+        /* =================== END SCREEN & POSTCARD =================== */
+        .end-hero { text-align: center; padding: 40px 0 24px; }
+        .end-hero h1 { font-size: 2.6rem; margin-bottom: 18px; }
+        
+        .postcard-preview-container {
+            margin: 24px 0; border: 2px solid var(--border); border-radius: 4px;
+            overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            background: #0a0d10; min-height: 200px; position: relative;
+        }
+        #postcard-img { width: 100%; display: none; object-fit: contain; }
+        #postcard-loading {
+            padding: 60px 20px; color: var(--accent); 
+            font-family: var(--font-mono); font-size: 0.9rem; letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        
+        .map-actions { display: flex; justify-content: center; margin-top: 24px; }
+        .map-actions button { padding: 18px 24px; font-size: 0.9rem; max-width: 400px; }
+
+        /* =================== UTILITAIRES =================== */
+        .center { text-align: center; }
+        .mt-sm { margin-top: 10px; }
+        .mt-md { margin-top: 20px; }
+        .mt-lg { margin-top: 32px; }
+        .row { display: flex; gap: 10px; }
+        .row > * { flex: 1; }
+
+        .badge-era {
+            display: inline-block; padding: 4px 12px;
+            border-radius: 100px;
+            font-family: var(--font-mono); font-size: 0.68rem;
+            letter-spacing: 0.22em; text-transform: uppercase;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border); color: var(--accent);
+        }
+        .typewriter { opacity: 0; animation: fadeIn 0.6s ease forwards; }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        .terminal-link {
+            display: block; width: 100%; background: rgba(0,0,0,0.5);
+            border: 1px solid var(--accent); color: var(--accent);
+            padding: 18px; text-align: center; text-decoration: none;
+            font-family: var(--font-mono); letter-spacing: 0.2em;
+            text-transform: uppercase; font-size: 0.95rem;
+            margin-bottom: 18px; border-radius: var(--radius);
+            transition: all 0.3s;
+        }
+        .terminal-link:hover { background: var(--accent); color: var(--bg-deep); box-shadow: var(--glow); }
+        .view-enter { animation: viewEnter 0.55s ease both; }
+        @keyframes viewEnter {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        body[data-era="cyber"] .blink::after {
+            content: '_'; color: var(--accent);
+            animation: blink 1s steps(2) infinite; margin-left: 2px;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+        @media (max-width: 480px) {
+            h1 { font-size: 1.7rem; }
+            body[data-era="baroque"] h1 { font-size: 2rem; }
+            .tracker .distance { font-size: 3rem; }
+        }
+
+        /* =================== BOOT =================== */
+        #bootScreen {
+            position: fixed; inset: 0; background: #050505;
+            color: #00f0ff; z-index: 9999;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem; line-height: 1.6;
+            padding: 20px;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            transition: opacity 0.8s ease-out;
+        }
+        .boot-line { margin-bottom: 4px; opacity: 0; animation: fadeInBoot 0.1s forwards; text-shadow: 0 0 5px #00f0ff; }
+        @keyframes fadeInBoot { to { opacity: 1; } }
+        #bootSkip {
+            position: absolute; top: 16px; right: 16px;
+            font-size: 0.7rem; color: #00f0ff; opacity: 0.6;
+            border: 1px solid #00f0ff; padding: 6px 10px; cursor: pointer;
+            background: transparent; letter-spacing: 0.2em; width: auto;
+            text-transform: uppercase;
+        }
+        #bootSkip:hover { opacity: 1; }
+
+        /* =================== TOAST =================== */
+        #toastHost {
+            position: fixed; top: 16px; left: 50%;
+            transform: translateX(-50%);
+            z-index: 9000; display: flex; flex-direction: column; gap: 8px;
+            pointer-events: none;
+        }
+        .toast {
+            background: rgba(10, 10, 12, 0.92);
+            color: var(--text); border: 1px solid var(--accent);
+            padding: 10px 16px; border-radius: var(--radius);
+            font-family: var(--font-mono); font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            box-shadow: var(--glow);
+            opacity: 0; transform: translateY(-12px);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: auto;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { border-color: var(--danger); color: #ff9080; }
+        .toast.ok { border-color: var(--success); color: #a5e0a8; }
+
+        /* =================== PAUSE =================== */
+        #pauseOverlay {
+            position: fixed; inset: 0; z-index: 9500;
+            background: rgba(5,5,8,0.92);
+            display: none; align-items: center; justify-content: center;
+            flex-direction: column;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        #pauseOverlay.show { display: flex; }
+        #pauseOverlay .pause-card {
+            text-align: center; padding: 40px;
+            max-width: 360px;
+        }
+        #pauseOverlay h2 {
+            font-family: var(--font-display); font-size: 2.4rem;
+            color: var(--accent); margin-bottom: 16px;
+            letter-spacing: 0.1em; text-shadow: var(--glow);
+        }
+        #pauseOverlay p { color: var(--muted); margin-bottom: 24px; }
+        #pauseOverlay button { max-width: 240px; }
+
+        /* =================== OFFLINE BANNER =================== */
+        #offlineBanner {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: linear-gradient(90deg, #b53d2a, #ff7a66);
+            color: #fff; padding: 8px 14px;
+            font-family: var(--font-mono); font-size: 0.75rem;
+            letter-spacing: 0.1em; text-align: center;
+            z-index: 8500;
+            transform: translateY(-100%);
+            transition: transform 0.4s ease;
+        }
+        #offlineBanner.show { transform: translateY(0); }
+
+        /* =================== HINT FLASH PUSH =================== */
+        #hintFlash {
+            position: fixed; inset: 0; z-index: 9100;
+            background: radial-gradient(circle at center, rgba(212, 175, 92, 0.4), transparent 60%);
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: none; opacity: 0;
+            transition: opacity 0.3s;
+        }
+        #hintFlash.show { opacity: 1; animation: hintPulse 0.6s ease; }
+        @keyframes hintPulse {
+            0% { opacity: 0; transform: scale(0.9); }
+            40% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.1); }
+        }
+        #hintFlash .hf-icon {
+            font-family: var(--font-display);
+            font-size: 4rem; color: var(--accent);
+            text-shadow: 0 0 30px var(--accent);
         }
     </style>
 </head>
-<body class="crt">
+<body data-era="baroque">
 
-    <div id="terminal-container">
-        <div id="output"></div>
-        
-        <form id="interactive-area" onsubmit="verifierReponse(event)">
-            <p id="riddle-text"></p>
-            <div class="input-group">
-                <span class="prompt-symbol">root@mainframe:~#</span>
-                <input type="text" id="answer-input" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="TAPER ICI...">
-            </div>
-            <button type="submit">Valider</button>
-            <p id="feedback-msg"></p>
-        </form>
+    <!-- Couche de Texture Matérielle Dynamique -->
+    <div id="bg-texture"></div>
+
+    <!-- Boot sequence -->
+    <div id="bootScreen">
+        <button id="bootSkip">SKIP ▶</button>
+        <div id="bootOutput"></div>
     </div>
 
-    <script>
-        // --- Configuration des textes ---
-        const introText = "CONNEXION AU MAINFRAME DES VEILLEURS...\nTOUR DE MOLARD. IDENTIFICATION REQUISE.\nRÉPONDEZ À L'ÉNIGME POUR OBTENIR LA CLÉ D'ACCÈS.";
-        const riddleText = "Je suis l'année où cette tour de béton a touché le ciel pour la première fois. Qui suis-je ?";
-        const correctAnswer = "1591"; // La logique de validation traitera tout en minuscules/sans espaces
+    <!-- Toasts -->
+    <div id="toastHost"></div>
+
+    <!-- Offline banner -->
+    <div id="offlineBanner">⚠ Hors-ligne — progression locale, sync à la reconnexion</div>
+
+    <!-- Hint push flash -->
+    <div id="hintFlash"><span class="hf-icon">✶</span></div>
+
+    <!-- Pause overlay -->
+    <div id="pauseOverlay">
+        <div class="pause-card">
+            <h2>Pause</h2>
+            <p>Le chrono est suspendu. Reprends quand tu es prêt.</p>
+            <button id="btnResume">Reprendre</button>
+        </div>
+    </div>
+
+    <div id="app"></div>
+
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Success overlay -->
+    <div id="successOverlay" class="overlay">
+        <div class="success-inner">
+            <div class="success-icon-wrap" id="successIconWrap"></div>
+            <h2 id="successTitle">Énigme Résolue</h2>
+            <p id="successSubtitle">Préparation de la prochaine épreuve…</p>
+        </div>
+    </div>
+
+    <!-- Era transition overlay -->
+    <div id="eraTransition">
+        <div class="era-line"></div>
+        <div class="era-text" id="eraText">Nouvelle ère</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, update, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // ============================== CONFIGURATION FIREBASE ==============================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDVamNu-r5FtTpWLHwzNDsr-bOurYwcrNk",
+            authDomain: "geneva-escape-game.firebaseapp.com",
+            projectId: "geneva-escape-game",
+            storageBucket: "geneva-escape-game.firebasestorage.app",
+            messagingSenderId: "508852204714",
+            appId: "1:508852204714:web:f0081bd381d5649a1e8cd3",
+            databaseURL: "https://geneva-escape-game-default-rtdb.europe-west1.firebasedatabase.app"
+        };
+        const appFirebase = initializeApp(firebaseConfig);
+        const db = getDatabase(appFirebase);
+        const urlParams = new URLSearchParams(window.location.search);
+        const TEAM_ID = urlParams.get('team') || "equipe_charlie";
+
+        // ============================== ANTI-SPOIL & SÉCURITÉ (CORRIGÉ 100%) ==============================
+        const ADMIN_TOKEN = "RUNMSVBTRTQy"; // "ECLIPSE42"
         
-        // --- Éléments du DOM ---
-        const outputDiv = document.getElementById('output');
-        const interactiveArea = document.getElementById('interactive-area');
-        const riddleP = document.getElementById('riddle-text');
-        const answerInput = document.getElementById('answer-input');
-        const feedbackMsg = document.getElementById('feedback-msg');
-        const terminalContainer = document.getElementById('terminal-container');
-
-        // --- Mécanique d'écriture (Machine à écrire) ---
-        async function typeWriter(text, element, speed = 40) {
-            element.classList.add('typing-cursor');
-            for (let i = 0; i < text.length; i++) {
-                element.innerHTML += text.charAt(i) === '\n' ? '<br>' : text.charAt(i);
-                terminalContainer.scrollTop = terminalContainer.scrollHeight;
-                await new Promise(resolve => setTimeout(resolve, speed));
-            }
-            element.classList.remove('typing-cursor');
-        }
-
-        // --- Séquence de démarrage ---
-        async function initSequence() {
-            const introP = document.createElement('p');
-            outputDiv.appendChild(introP);
-            await typeWriter(introText, introP, 50);
-            
-            // Petite pause avant d'afficher l'énigme
-            await new Promise(resolve => setTimeout(resolve, 800));
-            
-            interactiveArea.style.display = 'flex';
-            await typeWriter(riddleText, riddleP, 40);
-            
-            // Focus automatique sur l'input une fois le texte terminé
-            answerInput.focus();
-        }
-
-        // --- Validation de la réponse ---
-        function verifierReponse(e) {
-            e.preventDefault(); // Empêche le rechargement de la page
-            
-            // Nettoyage de l'input : insensible à la casse et suppression des espaces inutiles
-            const userAnswer = answerInput.value.trim().toLowerCase();
-            
-            if (userAnswer === correctAnswer) {
-                declencherVictoire();
-            } else {
-                afficherErreur();
+        function verifyCode(input, encodedTarget) {
+            if (!input) return false;
+            // Normalisation inébranlable : on vire les accents, on remplace , par ., on passe en maj et on ne garde que A-Z, 0-9 et .
+            const norm = String(input)
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .toUpperCase()
+                .replace(/,/g, '.')
+                .replace(/[^A-Z0-9.]/g, ''); 
+            try {
+                // Encodage base64 standard
+                const enc = btoa(unescape(encodeURIComponent(norm)));
+                return enc === encodedTarget;
+            } catch (e) {
+                return false;
             }
         }
+        
+        function decodeSecret(secret) {
+            if (!secret) return "—";
+            try { return decodeURIComponent(escape(atob(secret))); }
+            catch (e) { return "Erreur"; }
+        }
 
-        function afficherErreur() {
-            feedbackMsg.className = 'error';
-            feedbackMsg.innerHTML = 'ACCÈS REFUSÉ. IDENTIFIANT INCORRECT.';
-            answerInput.value = ''; // On vide le champ
-            answerInput.focus();
-            
-            // Efface le message d'erreur après 2.5 secondes
+        function verifyAnswer(input, step) {
+            const candidates = [step.secret, ...(step.alts || [])];
+            return candidates.some(c => verifyCode(input, c));
+        }
+
+        // ============================== DONNÉES DU JEU ==============================
+        const gameSteps = [
+            { id:1, era:'baroque', title:"Mur des Réformateurs", targetLat:46.2000, targetLon:6.1450,
+              iconSvg:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="16" width="52" height="40"/><path d="M14 56V30h6v26 M24 56V26h6v30 M34 56V26h6v30 M44 56V30h6v26"/></svg>',
+              transitionText:"Bienvenue, Initié. L'Ordre des Veilleurs est né dans le sillage de la Réforme, pour protéger le secret d'Éclipse. Ta première leçon se trouve face aux géants de pierre.",
+              question:"L'année gravée au centre du mur marque à la fois l'adoption de la Réforme et le pacte originel de notre Ordre. Quelle est cette année ?",
+              secret:"MTUzNg==", // 1536
+              hints:["Un chiffre, quatre symboles. L'année est gravée à hauteur d'homme entre les statues centrales.","Commence par 15… et se termine par un nombre pair multiple de 3.","Réponse : 1536."]
+            },
+            { id:2, era:'baroque', title:"La Treille", targetLat:46.2008, targetLon:6.1456,
+              iconSvg:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 44h56 M8 44v8 M24 44v8 M40 44v8 M56 44v8 M4 40h56"/><path d="M32 36 c -16 0 -24 -12 -16 -24 c 4 -6 12 -8 16 -8 c 4 0 12 2 16 8 c 8 12 0 24 -16 24 Z"/></svg>',
+              transitionText:"La sagesse des fondateurs est acquise. Nos ancêtres montaient la garde ici, scrutant l'horizon sud pour prévenir les invasions. Ce promontoire exigeait une patience infinie.",
+              question:"La vigie s'étendait sur toute la ligne de crête. Quelle est la longueur officielle (en mètres) de ce célèbre banc en bois, symbole de notre longue garde ?",
+              secret:"MTIw", // 120
+              hints:["C'est un banc record du monde — il dépasse les 100 mètres.","Un nombre rond, entre 100 et 150 mètres.","Réponse : 120"]
+            },
+            { id:3, era:'baroque', title:"L'Ancien Arsenal", targetLat:46.2011, targetLon:6.1473,
+              iconSvg:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 36 A 20 20 0 0 1 52 36"/><path d="M16 52 L 48 32 M12 56 L 44 36 M16 46 A 4 4 0 1 0 24 52 M40 30 A 4 4 0 1 0 48 36"/></svg>',
+              transitionText:"La foi ne suffit pas toujours, il faut parfois le fer et la poudre. Sous ces arcades, l'Ordre a stocké ses défenses lors des heures les plus sombres de la cité.",
+              question:"Observe les mosaïques relatant notre plus célèbre bataille nocturne. En quelle année les Veilleurs ont-ils aidé à repousser l'ennemi lors de l'Escalade ?",
+              secret:"MTYwMg==", // 1602
+              hints:["Une nuit sans lune, des échelles, des Savoyards. Le 11 décembre, mais quelle année ?","Au tout début du XVIIᵉ siècle.","Réponse : 1602."]
+            },
+            { id:4, era:'industrial', title:"Cathédrale Saint-Pierre", targetLat:46.2012, targetLon:6.1484,
+              iconSvg:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="32,8 8,24 56,24"/><path d="M12 24v32 M20 24v32 M28 24v32 M36 24v32 M44 24v32 M52 24v32 M4 56h56"/></svg>',
+              transitionText:"L'Ordre évolue. Nous entrons dans l'ère des bâtisseurs. Le sanctuaire central a été doté d'une façade imposante pour dissimuler et protéger nos archives.",
+              question:"Place-toi face à l'entrée principale. Quel est le code secret lié au nombre de colonnes monumentales soutenant le fronton de cet édifice ?",
+              secret:"Q0FMVklONg==", // CALVIN6
+              hints:["Le code combine le nom du plus célèbre réformateur de la ville et le nombre exact de colonnes géantes en façade.","CALVIN... suivi du chiffre.","Réponse : CALVIN6"]
+            },
+            { id:5, era:'industrial', title:"Place du Bourg-de-Four", targetLat:46.2004, targetLon:6.1493,
+              iconSvg:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 48 c0 8 32 8 32 0 c0 -4 -8 -6 -16 -6 s -16 2 -16 6 Z M32 42 V 12 M26 20 q -8 -6 -12 6 M38 20 q 8 -6 12 6 M32 12 l -4 -4 M32 12 l 4 -4"/></svg>',
+              transitionText:"La mécanique des fluides devient notre nouveau réseau de communication. Cette place en forme de sablier est le carrefour où les rumeurs et les secrets convergent.",
+              question:"Au centre trône la fontaine des échanges. Combien de gueules crachent le précieux liquide depuis son pilier central pour alimenter le bassin ?",
+              secret:"NA==", // 4
+              alts:["UVVBVFJF"], // QUATRE
+              hints:["Regarde le pilier central de la fontaine et compte les sorties d'eau.","Un nombre simple, correspondant aux points cardinaux.","Réponse : 4."]
+            },
+            { id:6, era:'industrial', title:"Tour de Bel-Air", targetLat:46.2044, targetLon:6.1432,
+              iconSvg:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M26 56 V 20 h 12 v 36 M18 56 V 36 h 8 M38 56 V 36 h 8 M8 56h48"/></svg>',
+              transitionText:"L'industrialisation frappe le ciel. La tour de Bel-Air, premier gratte-ciel de la cité, abrite dans ses fondations d'acier le tout premier serveur de l'Ordre.",
+              question:"Le terminal de la tour est protégé par une interface vintage. Connecte-toi et trouve le nom de l'architecture système (OS) qui gère nos données.",
+              secret:"Uk9ZQVVNRU9T", // ROYAUMEOS
+              hacking:true, terminalUrl:"https://hyakujunokaido.github.io/EscapeGameGenevaCruise/",
+              hints:["Tape sur le bouton TERMINAL ci-dessus, le hack se déroule dans un autre onglet.","La clé fait référence à un royaume et à un système d'exploitation.","Réponse : ROYAUME_OS."]
+            },
+            { id:7, era:'cyber', title:"L'Horloge Fleurie", targetLat:46.2053, targetLon:6.1534,
+              iconSvg:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="32" r="28" stroke-dasharray="4 6"/><circle cx="32" cy="32" r="20"/><path d="M32 32 L 42 22 M32 32 L 28 16 M32 12v4 M32 48v4 M12 32h4 M48 32h4"/></svg>',
+              transitionText:"Le temps n'est plus seulement une durée, c'est une fréquence de synchronisation mondiale. Ce parterre dissimule notre horloge atomique.",
+              question:"Pour calibrer ton terminal, j'ai besoin du rayon exact de balayage. Quelle est la longueur (en mètres) de l'immense trotteuse de cette horloge ? (ex : 2.5)",
+              secret:"Mi41", // 2.5
+              hints:["Une plaque d'information se trouve à proximité de l'horloge.","Entre 2 et 3 mètres, avec une décimale.","Réponse : 2.5"]
+            },
+            { id:8, era:'cyber', title:"Le Jet d'Eau", targetLat:46.2066, targetLon:6.1558,
+              iconSvg:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M32 56 C 32 20 40 8 52 4 M28 56 C 28 32 34 20 44 12 M20 56 C 20 40 24 30 32 20 M8 56 h 48"/></svg>',
+              transitionText:"La pression monte. Ce colosse liquide n'est autre que la valve de refroidissement de notre supercalculateur quantique immergé dans la rade.",
+              question:"À quelle vitesse cinétique (en km/h) l'eau est-elle propulsée vers le ciel pour dissiper l'énergie de nos serveurs ?",
+              secret:"MjAw", // 200
+              hints:["Un nombre rond, en centaines.","C'est la vitesse d'une voiture de sport ou d'un train rapide.","Réponse : 200"]
+            },
+            { id:9, era:'cyber', title:"Le Rooftop 42", targetLat:46.2036, targetLon:6.1504,
+              iconSvg:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 36 h 56 M12 36 l 16 -12 l 12 6 l 16 -10 v 16 M8 48 h 48 M16 56 h 32"/></svg>',
+              transitionText:"Tu as atteint le point de liaison (uplink). Depuis les hauteurs de ce bâtiment, l'Ordre surveille l'intégralité du bassin de données.",
+              question:"Observe l'étendue bleue qui s'offre à toi. Quel est le nom de code régional de cet immense miroir d'eau qui cache nos câbles sous-marins ?",
+              secret:"TEVNQU4=", // LEMAN
+              alts:[
+                "TEFDTEVNQU4=", // LACLEMAN
+                "TEFLRQ==" // LAKE
+              ],
+              hints:["C'est le plus grand lac d'Europe occidentale.","Il partage son nom avec le bassin régional.","Réponse : LEMAN"]
+            }
+        ];
+
+        function eraOf(stepIndex) {
+            if (stepIndex < 3) return 'baroque';
+            if (stepIndex < 6) return 'industrial';
+            return 'cyber';
+        }
+        const ERA_LABELS = {
+            baroque: 'Ère I — Réforme & Pierre',
+            industrial: 'Ère II — Mécanique & Vapeur',
+            cyber: 'Ère III — Réseau & Néon'
+        };
+        const ERA_TRANSITION_MODE = {
+            'baroque->industrial': 'ash',
+            'industrial->cyber': 'pixel'
+        };
+
+        // ============================== ÉTAT GLOBAL ==============================
+        const appContainer = document.getElementById('app');
+        let currentStepIndex = parseInt(localStorage.getItem('escapeLocalStep')) || 0;
+        let currentView = localStorage.getItem('escapeLocalView') || 'transition';
+        let watchId = null;
+        let titleClickCount = 0;
+        let titleClickTimer = null;
+        let startTimestamp = parseInt(localStorage.getItem('escapeStartTs')) || 0;
+        let lastFbHintsReleased = 0;
+        let lastFbCustomHint = "";
+        let lastRenderedEra = null;
+        let attemptsByStep = JSON.parse(localStorage.getItem('escapeAttempts') || '{}');
+        let isPaused = false;
+        let pauseStart = 0;
+        let pausedDuration = parseInt(localStorage.getItem('escapePausedDuration')) || 0;
+        let isOnline = navigator.onLine;
+        let firebaseConnected = true;
+
+        const isTestMode = urlParams.get('test') === 'true';
+        const isGMSession = urlParams.get('mode') === 'gm';
+
+        // ============================== BOUSSOLE & GPS ==============================
+        let currentDeviceHeading = 0;
+        let currentTargetBearing = 0;
+        let currentDistance = 9999;
+        let accumulatedCompassRotation = 0;
+        let smoothedLat = null, smoothedLon = null;
+        const ALPHA_SMOOTHING = 0.4;
+        let gpsSearchStartTime = 0;
+        let gyroAttached = false;
+
+        function getDistanceInMeters(lat1, lon1, lat2, lon2) {
+            const R = 6371e3, rad = Math.PI / 180;
+            const a = Math.sin((lat2 - lat1)*rad / 2) ** 2 +
+                      Math.cos(lat1*rad) * Math.cos(lat2*rad) * Math.sin((lon2 - lon1)*rad / 2) ** 2;
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+        }
+        function getBearing(lat1, lon1, lat2, lon2) {
+            const rad = Math.PI / 180;
+            const dLon = (lon2 - lon1) * rad;
+            lat1 *= rad; lat2 *= rad;
+            const y = Math.sin(dLon) * Math.cos(lat2);
+            const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+            return (Math.atan2(y, x) * (180 / Math.PI) + 360) % 360;
+        }
+        function updateCompassUI() {
+            const svgGroup = document.getElementById('compass-group');
+            const arc = document.getElementById('compass-arc');
+            if (!svgGroup || !arc) return;
+            const fillRatio = 0.15 + ((1.0 - Math.min(1, Math.max(0, (currentDistance - 20) / 130))) * 0.85);
+            arc.style.strokeDashoffset = 238.76 * (1 - fillRatio);
+            let raw = currentTargetBearing - currentDeviceHeading;
+            let delta = raw - (accumulatedCompassRotation % 360);
+            delta = ((delta + 180) % 360 + 360) % 360 - 180;
+            accumulatedCompassRotation += delta;
+            svgGroup.style.transform = `rotate(${accumulatedCompassRotation - (180 * fillRatio)}deg)`;
+        }
+        function handleOrientation(e) {
+            let heading = null;
+            if (e.webkitCompassHeading !== undefined) heading = e.webkitCompassHeading;
+            else if (e.absolute === true || e.alpha !== null) heading = 360 - e.alpha;
+            if (heading !== null) {
+                currentDeviceHeading = heading;
+                updateCompassUI();
+            }
+        }
+        function attachGyroOnce() {
+            if (gyroAttached || isGMSession) return; // Désactivé pour le GM
+            window.addEventListener('deviceorientationabsolute', handleOrientation);
+            window.addEventListener('deviceorientation', handleOrientation);
+            gyroAttached = true;
+        }
+
+        // ============================== AUDIO ==============================
+        let audioCtx = null;
+        function ensureAudio() {
+            if (!audioCtx) {
+                try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+                catch (e) { audioCtx = null; }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+        function playTone(freq, dur = 0.18, type = 'sine', vol = 0.18, when = 0) {
+            const ctx = ensureAudio(); if (!ctx) return;
+            const t0 = ctx.currentTime + when;
+            const osc = ctx.createOscillator(); const gain = ctx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, t0);
+            gain.gain.setValueAtTime(0, t0);
+            gain.gain.linearRampToValueAtTime(vol, t0 + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(t0); osc.stop(t0 + dur + 0.05);
+        }
+        function sfx(name) {
+            const era = eraOf(currentStepIndex);
+            if (name === 'success') {
+                if (era === 'baroque') {
+                    playTone(523.25, 0.25, 'triangle', 0.16, 0);
+                    playTone(659.25, 0.25, 'triangle', 0.14, 0.12);
+                    playTone(783.99, 0.45, 'triangle', 0.14, 0.24);
+                } else if (era === 'industrial') {
+                    playTone(440, 0.18, 'sawtooth', 0.10, 0);
+                    playTone(554.37, 0.18, 'sawtooth', 0.10, 0.10);
+                    playTone(659.25, 0.35, 'square', 0.10, 0.20);
+                } else {
+                    playTone(880, 0.10, 'square', 0.10, 0);
+                    playTone(1318.51, 0.10, 'square', 0.10, 0.08);
+                    playTone(1760, 0.30, 'sine', 0.12, 0.16);
+                    playTone(2637.02, 0.40, 'sine', 0.06, 0.20);
+                }
+            } else if (name === 'error') {
+                playTone(180, 0.18, 'sawtooth', 0.18, 0);
+                playTone(120, 0.30, 'sawtooth', 0.16, 0.08);
+                if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+            } else if (name === 'hint') {
+                playTone(880, 0.08, 'sine', 0.10, 0);
+                playTone(1108.73, 0.12, 'sine', 0.10, 0.07);
+                playTone(1318.51, 0.18, 'sine', 0.10, 0.14);
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+            } else if (name === 'arrive') {
+                playTone(523.25, 0.10, 'sine', 0.12, 0);
+                playTone(783.99, 0.18, 'sine', 0.12, 0.10);
+                if (navigator.vibrate) navigator.vibrate([30, 30, 30]);
+            } else if (name === 'click') {
+                playTone(660, 0.05, 'square', 0.06, 0);
+            }
+        }
+
+        // ============================== TOAST ==============================
+        function toast(msg, type = '', duration = 2400) {
+            const host = document.getElementById('toastHost');
+            const el = document.createElement('div');
+            el.className = `toast ${type}`;
+            el.innerText = msg;
+            host.appendChild(el);
+            requestAnimationFrame(() => el.classList.add('show'));
             setTimeout(() => {
-                feedbackMsg.innerHTML = '';
-            }, 2500);
+                el.classList.remove('show');
+                setTimeout(() => el.remove(), 350);
+            }, duration);
         }
 
-        // --- Séquence de Victoire (Hack réussi) ---
-        async function declencherVictoire() {
-            // Masquer l'interface de saisie
-            interactiveArea.style.display = 'none';
-            outputDiv.innerHTML = ''; // Nettoyer l'écran
+        // ============================== FIREBASE ==============================
+        function writeSession(payload) {
+            return update(ref(db, `session/${TEAM_ID}`), payload).catch(err => {
+                console.warn("Firebase write failed (offline?):", err);
+            });
+        }
+        function updateFirebaseState(stepIndex, viewName) {
+            writeSession({
+                step: stepIndex, view: viewName,
+                hintsReleased: 0, customHint: ""
+            });
+        }
+
+        // ============================== ÈRE / TRANSITION ==============================
+        function applyEra(era, opts = {}) {
+            const animate = opts.animate !== false;
+            const previous = document.body.getAttribute('data-era');
+            if (previous === era) return;
+            if (previous && animate) {
+                const overlay = document.getElementById('eraTransition');
+                document.getElementById('eraText').innerText = ERA_LABELS[era];
+                const mode = ERA_TRANSITION_MODE[`${previous}->${era}`];
+                overlay.removeAttribute('data-mode');
+                // Nettoyer ancien éléments narratifs
+                overlay.querySelectorAll('.ash, .pixel').forEach(n => n.remove());
+                if (mode === 'ash') {
+                    overlay.setAttribute('data-mode', 'ash');
+                    for (let i = 0; i < 60; i++) {
+                        const ash = document.createElement('div');
+                        ash.className = 'ash';
+                        ash.style.left = (Math.random() * 100) + 'vw';
+                        ash.style.animationDelay = (Math.random() * 0.6) + 's';
+                        ash.style.width = ash.style.height = (3 + Math.random() * 6) + 'px';
+                        ash.style.background = ['#d4af5c','#b53d2a','#5a3a18'][i % 3];
+                        overlay.appendChild(ash);
+                    }
+                } else if (mode === 'pixel') {
+                    overlay.setAttribute('data-mode', 'pixel');
+                    for (let i = 0; i < 80; i++) {
+                        const p = document.createElement('div');
+                        p.className = 'pixel';
+                        p.style.left = (Math.random() * 100) + 'vw';
+                        p.style.top = (Math.random() * 100) + 'vh';
+                        p.style.animationDelay = (Math.random() * 0.8) + 's';
+                        p.style.background = ['#00f0ff','#ff2bd6','#7afff0'][i % 3];
+                        overlay.appendChild(p);
+                    }
+                }
+                overlay.classList.add('show');
+                playTone(220, 0.25, 'sine', 0.12, 0);
+                playTone(440, 0.4, 'sine', 0.10, 0.2);
+                setTimeout(() => { document.body.setAttribute('data-era', era); }, 700);
+                setTimeout(() => {
+                    overlay.classList.remove('show');
+                    overlay.removeAttribute('data-mode');
+                    overlay.querySelectorAll('.ash, .pixel').forEach(n => n.remove());
+                }, 2200);
+            } else {
+                document.body.setAttribute('data-era', era);
+            }
+        }
+
+        // ============================== PARTICULES ==============================
+        const canvas = document.getElementById('particleCanvas');
+        const ctx2d = canvas.getContext('2d');
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        function burstParticles(era, opts = {}) {
+            const N = opts.count || 90;
+            const cy = opts.cy || canvas.height * 0.42;
+            const cx = opts.cx || canvas.width / 2;
+            const palette = {
+                baroque: ['#d4af5c', '#f0d68a', '#b53d2a', '#efe2c2'],
+                industrial: ['#c89243', '#e8b75a', '#b87333', '#e0d6c5'],
+                cyber: ['#00f0ff', '#ff2bd6', '#7afff0', '#ffffff']
+            }[era] || ['#fff'];
+            const particles = [];
+            for (let i = 0; i < N; i++) {
+                const a = Math.random() * Math.PI * 2;
+                const v = 3 + Math.random() * 7;
+                particles.push({
+                    x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 2,
+                    g: 0.18, life: 0, max: 70 + Math.random() * 50,
+                    color: palette[i % palette.length],
+                    size: 2 + Math.random() * 4,
+                    rot: Math.random() * Math.PI,
+                    vrot: (Math.random() - 0.5) * 0.3,
+                    shape: era === 'baroque' ? 'petal' : era === 'industrial' ? 'gear' : 'square'
+                });
+            }
+            function frame() {
+                ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = 0;
+                for (const p of particles) {
+                    if (p.life >= p.max) continue;
+                    alive++; p.life++;
+                    p.vy += p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
+                    ctx2d.save();
+                    ctx2d.translate(p.x, p.y);
+                    ctx2d.rotate(p.rot);
+                    ctx2d.fillStyle = p.color;
+                    ctx2d.globalAlpha = 1 - (p.life / p.max);
+                    if (p.shape === 'square') {
+                        ctx2d.fillRect(-p.size, -p.size, p.size * 2, p.size * 2);
+                    } else if (p.shape === 'petal') {
+                        ctx2d.beginPath();
+                        ctx2d.ellipse(0, 0, p.size, p.size * 2, 0, 0, Math.PI * 2);
+                        ctx2d.fill();
+                    } else {
+                        ctx2d.beginPath();
+                        for (let k = 0; k < 6; k++) {
+                            const r = k % 2 ? p.size : p.size * 1.7;
+                            const an = (k / 6) * Math.PI * 2;
+                            ctx2d.lineTo(Math.cos(an) * r, Math.sin(an) * r);
+                        }
+                        ctx2d.closePath(); ctx2d.fill();
+                    }
+                    ctx2d.restore();
+                }
+                if (alive > 0) requestAnimationFrame(frame);
+                else ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            frame();
+        }
+
+        // ============================== ICÔNE SUCCÈS PAR ÈRE ==============================
+        function getSuccessIcon(era) {
+            if (era === 'baroque') {
+                return `<svg class="seal-svg" viewBox="0 0 110 110">
+                    <defs><radialGradient id="sealG" cx="50%" cy="40%" r="60%">
+                        <stop offset="0%" stop-color="#f0d68a"/>
+                        <stop offset="70%" stop-color="#d4af5c"/>
+                        <stop offset="100%" stop-color="#8a6b2d"/>
+                    </radialGradient></defs>
+                    <circle cx="55" cy="55" r="48" fill="url(#sealG)" stroke="#5a3a18" stroke-width="2"/>
+                    <circle cx="55" cy="55" r="38" fill="none" stroke="#5a3a18" stroke-width="1" stroke-dasharray="2 3"/>
+                    <text x="55" y="65" text-anchor="middle" font-family="UnifrakturCook, serif" font-size="34" fill="#3a230d" font-weight="700">É</text>
+                </svg>`;
+            }
+            if (era === 'industrial') {
+                return `<svg class="gear-svg" viewBox="0 0 110 110">
+                    <g transform="translate(55 55)">
+                        ${Array.from({length:12}, (_,i)=>{
+                            const a = (i/12)*Math.PI*2;
+                            const x1 = Math.cos(a)*38, y1 = Math.sin(a)*38;
+                            const x2 = Math.cos(a)*48, y2 = Math.sin(a)*48;
+                            return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#c89243" stroke-width="8" stroke-linecap="round"/>`;
+                        }).join('')}
+                        <circle r="34" fill="none" stroke="#c89243" stroke-width="6"/>
+                        <circle r="16" fill="#c89243"/>
+                        <circle r="8" fill="#0a0d10"/>
+                        <path d="M -14 0 L -4 10 L 14 -10" stroke="#0a0d10" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="scale(0.8)"/>
+                    </g>
+                </svg>`;
+            }
+            return `<svg class="ok-svg" viewBox="0 0 130 60"><text x="50%" y="42" text-anchor="middle">[ OK ]</text></svg>`;
+        }
+
+        function showSuccessOverlay(onDone) {
+            const era = eraOf(currentStepIndex);
+            const overlay = document.getElementById('successOverlay');
+            const iconWrap = document.getElementById('successIconWrap');
+            iconWrap.innerHTML = getSuccessIcon(era);
+            const messages = {
+                baroque: ["Énigme Résolue", "L'Ordre approuve ton flair."],
+                industrial: ["Validation acceptée", "Mécanisme déverrouillé."],
+                cyber: ["// ACCESS GRANTED", "Protocole suivant en chargement…"]
+            }[era];
+            document.getElementById('successTitle').innerText = messages[0];
+            document.getElementById('successSubtitle').innerText = messages[1];
+            overlay.classList.add('show');
+            sfx('success');
+            burstParticles(era);
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                setTimeout(() => onDone && onDone(), 600);
+            }, 2200);
+        }
+
+        // ============================== HINT PUSH ==============================
+        function flashHintReceived() {
+            const flash = document.getElementById('hintFlash');
+            flash.classList.add('show');
+            sfx('hint');
+            toast("Nouvel indice reçu", "ok", 3000);
+            setTimeout(() => flash.classList.remove('show'), 700);
+        }
+
+        // ============================== PAUSE ==============================
+        function setPaused(p) {
+            const ov = document.getElementById('pauseOverlay');
+            isPaused = p;
+            if (p) {
+                pauseStart = Date.now();
+                ov.classList.add('show');
+                if (watchId) navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            } else {
+                if (pauseStart) {
+                    pausedDuration += Date.now() - pauseStart;
+                    localStorage.setItem('escapePausedDuration', pausedDuration);
+                }
+                pauseStart = 0;
+                ov.classList.remove('show');
+                renderPlayerUI({ hintsReleased: lastFbHintsReleased, customHint: lastFbCustomHint });
+            }
+        }
+        document.getElementById('btnResume').onclick = () => { sfx('click'); setPaused(false); };
+
+        // ============================== TILT 3D AVEC rAF ==============================
+        let lastTiltX = 0, lastTiltY = 0;
+        let tiltScheduled = false;
+        function scheduleTilt() {
+            if (tiltScheduled || isGMSession) return;
+            tiltScheduled = true;
+            requestAnimationFrame(() => {
+                tiltScheduled = false;
+                document.querySelectorAll('.card-container').forEach(c => {
+                    c.style.setProperty('--tilt-x', `${lastTiltX}deg`);
+                    c.style.setProperty('--tilt-y', `${lastTiltY}deg`);
+                });
+            });
+        }
+        window.addEventListener('mousemove', (e) => {
+            if (isPaused || isGMSession) return;
+            lastTiltY = (window.innerWidth / 2 - e.pageX) / -45;
+            lastTiltX = (window.innerHeight / 2 - e.pageY) / 45;
+            scheduleTilt();
+        });
+        window.addEventListener('deviceorientation', (e) => {
+            if (isPaused || isGMSession) return;
+            if (e.gamma == null || e.beta == null) return;
+            lastTiltY = Math.min(Math.max(e.gamma / 4, -8), 8);
+            lastTiltX = Math.min(Math.max((e.beta - 45) / 4, -8), 8);
+            scheduleTilt();
+        });
+
+        // ============================== LOGIQUE JOUEUR ==============================
+        function advanceToNextStep() {
+            const previousEra = eraOf(currentStepIndex);
+            currentStepIndex++;
+            smoothedLat = null; smoothedLon = null; gpsSearchStartTime = 0;
+
+            if (currentStepIndex >= gameSteps.length) {
+                localStorage.setItem('escapeLocalStep', currentStepIndex);
+                writeSession({ step: currentStepIndex, view: 'end', hintsReleased: 0, customHint: "" });
+                showSuccessOverlay(() => renderEndScreen());
+                return;
+            }
+            const newEra = eraOf(currentStepIndex);
+            currentView = 'transition';
+            localStorage.setItem('escapeLocalStep', currentStepIndex);
+            localStorage.setItem('escapeLocalView', currentView);
+            updateFirebaseState(currentStepIndex, currentView);
+
+            showSuccessOverlay(() => {
+                if (newEra !== previousEra) applyEra(newEra);
+                renderPlayerUI();
+            });
+        }
+
+        function attachSecretAccess() {
+            const titleEl = document.querySelector('h1'); if (!titleEl) return;
+            titleEl.addEventListener('click', () => {
+                titleClickCount++;
+                clearTimeout(titleClickTimer);
+                titleClickTimer = setTimeout(() => { titleClickCount = 0; }, 1500);
+                if (titleClickCount >= 7) {
+                    titleClickCount = 0;
+                    const attempt = prompt("Console Admin // Entrez la clé :");
+                    if (attempt && verifyCode(attempt, ADMIN_TOKEN)) {
+                        sessionStorage.setItem('gmAuth', '1');
+                        window.location.href = "?mode=gm" + (urlParams.get('team') ? `&team=${urlParams.get('team')}` : '');
+                    } else if (attempt) {
+                        toast("Accès refusé.", "error");
+                    }
+                }
+            });
+        }
+
+        function progressDots(stepIdx) {
+            let html = '<div class="progress" data-testid="progress-bar">';
+            for (let i = 0; i < gameSteps.length; i++) {
+                html += `<div class="dot ${i < stepIdx ? 'done' : (i === stepIdx ? 'current' : '')}"></div>`;
+            }
+            return html + '</div>';
+        }
+
+        function topbar(stepIdx) {
+            return `
+                <div class="topbar">
+                    <span class="badge-era">${ERA_LABELS[eraOf(stepIdx)]}</span>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <button class="btn-pause" id="btn-pause" data-testid="btn-pause">⏸ Pause</button>
+                        <span class="meta" data-testid="step-counter">${Math.min(stepIdx + 1, gameSteps.length)}/${gameSteps.length}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function bindPauseBtn() {
+            const b = document.getElementById('btn-pause');
+            if (b) b.onclick = () => { sfx('click'); setPaused(true); };
+        }
+
+        function renderPlayerUI(fbState) {
+            if (currentStepIndex >= gameSteps.length) return renderEndScreen();
+            const step = gameSteps[currentStepIndex];
             
-            // Changement de couleur d'ambiance (vert -> bleu cyan pour marquer le déverrouillage)
-            document.documentElement.style.setProperty('--neon-green', '#00FFFF');
-            
-            // Effet "Matrix" / Lignes de code qui défilent
-            const codeLines = 25;
-            for(let i=0; i<codeLines; i++) {
-                const p = document.createElement('p');
-                p.className = 'success-code';
-                p.innerText = genererLigneHexa();
-                outputDiv.appendChild(p);
-                terminalContainer.scrollTop = terminalContainer.scrollHeight;
-                await new Promise(resolve => setTimeout(resolve, 50));
+            document.body.setAttribute('data-step', step.id);
+
+            const era = eraOf(currentStepIndex);
+            if (lastRenderedEra !== era) {
+                applyEra(era, { animate: lastRenderedEra !== null });
+                lastRenderedEra = era;
+            }
+            const hintsReleased = (fbState && fbState.hintsReleased) || 0;
+            const customHint = (fbState && fbState.customHint) || "";
+            appContainer.innerHTML = '';
+
+            if (currentView === 'transition') {
+                appContainer.innerHTML = `
+                    <div class="view-enter">
+                        ${topbar(currentStepIndex)}
+                        ${progressDots(currentStepIndex)}
+                        <h1 class="glitch" data-testid="mission-title">
+                            <span class="title-icon">${step.iconSvg}</span>
+                            Mission ${step.id} <span class="blink"></span>
+                        </h1>
+                        <div class="ornament"></div>
+                        <div class="card-container">
+                            <div class="card">
+                                <div class="location-watermark">${step.iconSvg}</div>
+                                <div class="label">Briefing</div>
+                                <p class="typewriter" data-testid="transition-text">${step.transitionText}</p>
+                            </div>
+                        </div>
+                        ${renderHints(step, hintsReleased, customHint)}
+                    </div>
+                    <div class="bottom-action">
+                        <button id="btn-nav" data-testid="btn-start-nav">Démarrer la navigation</button>
+                    </div>
+                `;
+                document.getElementById('btn-nav').onclick = () => {
+                    sfx('click');
+                    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                        DeviceOrientationEvent.requestPermission()
+                            .then(permissionState => {
+                                if (permissionState === 'granted') attachGyroOnce();
+                                launchGPSView();
+                            })
+                            .catch(err => { console.warn("Gyro denied:", err); launchGPSView(); });
+                    } else {
+                        attachGyroOnce();
+                        launchGPSView();
+                    }
+                };
+            }
+            else if (currentView === 'gps') {
+                let html = `
+                    <div class="view-enter">
+                        ${topbar(currentStepIndex)}
+                        ${progressDots(currentStepIndex)}
+                        <h1 class="glitch" data-testid="gps-title">
+                            <span class="title-icon">${step.iconSvg}</span>
+                            Cible : ${step.title}
+                        </h1>
+                        <div class="card-container">
+                            <div class="tracker card">
+                                <div class="location-watermark">${step.iconSvg}</div>
+                                <div class="label-dist">Distance restante</div>
+                                <div class="distance" id="dist-display" data-testid="distance-display">-- m</div>
+                                <div class="compass-ring">
+                                    <svg class="compass-svg" viewBox="0 0 96 96">
+                                        <g id="compass-group" style="transform-origin: 48px 48px; transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);">
+                                            <circle id="compass-arc" cx="48" cy="48" r="38"
+                                                fill="none" stroke="var(--accent)" stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-dasharray="238.76" stroke-dashoffset="238.76"
+                                                style="transform: rotate(-90deg); transform-origin: 48px 48px; transition: stroke-dashoffset 0.5s ease-out; filter: drop-shadow(0 0 4px var(--accent));" />
+                                        </g>
+                                    </svg>
+                                    <div class="dot-inner"></div>
+                                </div>
+                                <div class="accuracy" id="acc-display">Acquisition GPS…</div>
+                                <div id="gps-fallback-zone" style="margin-top: 14px;"></div>
+                            </div>
+                        </div>
+                        ${renderHints(step, hintsReleased, customHint)}
+                    </div>
+                    <div class="bottom-action">
+                        <button id="btn-arrive" disabled data-testid="btn-arrive">Acquisition Signal…</button>
+                `;
+                if (isTestMode) html += `<button id="btn-force-gps" class="btn-dev" data-testid="btn-test-skip">🛠 Simuler arrivée (TEST)</button>`;
+                html += `</div>`;
+                appContainer.innerHTML = html;
+
+                gpsSearchStartTime = Date.now();
+                startGPS(step.targetLat, step.targetLon);
+                attachGyroOnce();
+                if (isTestMode) {
+                    document.getElementById('btn-force-gps').onclick = () => {
+                        currentView = 'enigma';
+                        localStorage.setItem('escapeLocalView', currentView);
+                        writeSession({ view: currentView });
+                        renderPlayerUI(fbState);
+                    };
+                }
+            }
+            else if (currentView === 'enigma') {
+                if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+                const terminalBlock = step.hacking ? `
+                    <a class="terminal-link" href="${step.terminalUrl}" target="_blank" rel="noopener" data-testid="link-terminal">
+                        ▶ Ouvrir le terminal mainframe
+                    </a>` : '';
+                const attempts = attemptsByStep[currentStepIndex] || 0;
+                const attemptsBadge = attempts > 0
+                    ? `<div style="font-family:var(--font-mono); font-size:0.7rem; letter-spacing:0.15em; color:var(--muted); margin-top:8px;">Tentatives : ${attempts}</div>`
+                    : '';
+                appContainer.innerHTML = `
+                    <div class="view-enter">
+                        ${topbar(currentStepIndex)}
+                        ${progressDots(currentStepIndex)}
+                        <h1 class="glitch" data-testid="enigma-title">
+                            <span class="title-icon">${step.iconSvg}</span>
+                            Analyse requise
+                        </h1>
+                        <div class="card-container">
+                            <div class="card">
+                                <div class="location-watermark">${step.iconSvg}</div>
+                                <div class="label">Énigme</div>
+                                <p data-testid="enigma-question">${step.question}</p>
+                                ${terminalBlock}
+                                <input type="text" id="answer-input" placeholder="Entre la réponse…" autocapitalize="none" data-testid="answer-input">
+                                ${attemptsBadge}
+                            </div>
+                        </div>
+                        ${renderHints(step, hintsReleased, customHint)}
+                    </div>
+                    <div class="bottom-action">
+                        <button id="btn-submit" data-testid="btn-submit-answer">Valider</button>
+                    </div>
+                `;
+                const input = document.getElementById('answer-input'); input.focus();
+                input.addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('btn-submit').click(); });
+                document.getElementById('btn-submit').onclick = () => {
+                    sfx('click');
+                    if (verifyAnswer((input.value || '').trim(), step)) {
+                        advanceToNextStep();
+                    } else {
+                        attemptsByStep[currentStepIndex] = (attemptsByStep[currentStepIndex] || 0) + 1;
+                        localStorage.setItem('escapeAttempts', JSON.stringify(attemptsByStep));
+                        writeSession({ [`attemptsByStep/${currentStepIndex}`]: attemptsByStep[currentStepIndex] });
+                        sfx('error');
+                        const card = appContainer.querySelector('.card');
+                        card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+                        input.value = '';
+                    }
+                };
             }
 
-            // Message de victoire final
-            await new Promise(resolve => setTimeout(resolve, 500));
-            const victoryDiv = document.createElement('div');
-            victoryDiv.className = 'victory-msg';
-            victoryDiv.innerHTML = 'ACCÈS AUTORISÉ<br><br>VOTRE CLÉ DE DÉVERROUILLAGE EST :<br><strong>ROYAUME_OS</strong>';
-            outputDiv.appendChild(victoryDiv);
-            terminalContainer.scrollTop = terminalContainer.scrollHeight;
+            bindPauseBtn();
+            attachSecretAccess();
         }
 
-        // --- Utilitaire : Générateur de fausses lignes de code ---
-        function genererLigneHexa() {
-            const chars = '0123456789ABCDEF!@#$%^&*()';
-            let line = 'BYPASSING FIREWALL... [OK] 0x';
-            for(let i=0; i<30; i++) {
-                line += chars.charAt(Math.floor(Math.random() * chars.length));
+        function launchGPSView() {
+            currentView = 'gps';
+            localStorage.setItem('escapeLocalView', currentView);
+            writeSession({ view: currentView });
+            renderPlayerUI();
+        }
+
+        function renderHints(step, releasedCount, customHint) {
+            if (releasedCount <= 0 && !customHint) return '';
+            let html = '<div class="hints-zone" data-testid="hints-zone"><div class="label">Indices reçus</div>';
+            if (customHint) {
+                html += `
+                    <div class="hint-card custom" data-testid="hint-custom">
+                        <div class="hint-label">Message du Maître</div>
+                        <div>${escapeHtml(customHint)}</div>
+                    </div>`;
             }
-            return line;
+            for (let i = 0; i < releasedCount && i < (step.hints?.length || 0); i++) {
+                html += `
+                    <div class="hint-card" data-testid="hint-${i + 1}">
+                        <div class="hint-label">Indice ${i + 1}</div>
+                        <div>${escapeHtml(step.hints[i])}</div>
+                    </div>`;
+            }
+            return html + '</div>';
+        }
+        function escapeHtml(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
-        // Lancement au chargement
-        window.onload = initSequence;
+        function startGPS(targetLat, targetLon) {
+            const display = document.getElementById('dist-display');
+            const accEl = document.getElementById('acc-display');
+            const btn = document.getElementById('btn-arrive');
+            const fallbackZone = document.getElementById('gps-fallback-zone');
+            let arrived = false;
+            if (!navigator.geolocation) { display.innerText = 'GPS indisponible'; return; }
+
+            watchId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    const rawLat = pos.coords.latitude, rawLon = pos.coords.longitude, accuracy = pos.coords.accuracy;
+                    if (smoothedLat === null) { smoothedLat = rawLat; smoothedLon = rawLon; }
+                    else if (accuracy < 60) {
+                        smoothedLat = (ALPHA_SMOOTHING * rawLat) + ((1 - ALPHA_SMOOTHING) * smoothedLat);
+                        smoothedLon = (ALPHA_SMOOTHING * rawLon) + ((1 - ALPHA_SMOOTHING) * smoothedLon);
+                    }
+                    currentDistance = Math.round(getDistanceInMeters(smoothedLat, smoothedLon, targetLat, targetLon));
+                    display.innerText = `${currentDistance} m`;
+                    const validationRadius = Math.max(20, Math.min(45, accuracy * 0.7));
+                    
+                    if (accuracy > 30) accEl.innerHTML = `<span style="color:var(--danger)">Précision faible (±${Math.round(accuracy)}m)</span>`;
+                    else accEl.innerText = `Précision ±${Math.round(accuracy)} m`;
+
+                    currentTargetBearing = getBearing(smoothedLat, smoothedLon, targetLat, targetLon);
+                    updateCompassUI();
+
+                    const elapsed = (Date.now() - gpsSearchStartTime) / 1000;
+                    if (elapsed > 60 && currentDistance < 50 && fallbackZone && !fallbackZone.innerHTML) {
+                        fallbackZone.innerHTML = `
+                            <div style="font-size:0.72rem; color:var(--muted); margin-bottom:8px; letter-spacing:0.1em;">La précision GPS varie en ville. Si tu vois le lieu, valide manuellement.</div>
+                            <button class="btn-secondary" style="font-size:0.78rem; padding:12px;">Valider manuellement</button>`;
+                        fallbackZone.querySelector('button').onclick = () => {
+                            sfx('click');
+                            currentView = 'enigma';
+                            localStorage.setItem('escapeLocalView', currentView);
+                            writeSession({ view: currentView });
+                            renderPlayerUI();
+                        };
+                    }
+
+                    if (currentDistance <= validationRadius) {
+                        if (!arrived) { arrived = true; sfx('arrive'); toast("Cible atteinte", "ok"); }
+                        btn.disabled = false; btn.innerText = "Je suis arrivé";
+                        btn.onclick = () => {
+                            sfx('click');
+                            currentView = 'enigma';
+                            localStorage.setItem('escapeLocalView', currentView);
+                            writeSession({ view: currentView });
+                            renderPlayerUI();
+                        };
+                    } else {
+                        arrived = false; btn.disabled = true;
+                        btn.innerText = currentDistance < 80 ? "Approche encore…" : "Hors zone";
+                        btn.onclick = null;
+                    }
+                },
+                (err) => {
+                    display.innerText = "Erreur GPS";
+                    if (err.code === 1) accEl.innerHTML = "Accès refusé.<br><span style='font-size:0.65rem; color:var(--danger); display:block; margin-top:4px;'>Sur iPhone : Réglages > Safari > Position > Autoriser, puis rechargez.</span>";
+                    else if (err.code === 2) accEl.innerText = "Position introuvable. Activez le Wi-Fi.";
+                    else if (err.code === 3) accEl.innerText = "Délai dépassé. Signal GPS trop faible.";
+                    else accEl.innerText = err.message || "Erreur inconnue";
+                },
+                { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+            );
+        }
+
+        function fmtDuration(ms) {
+            if (!ms || ms < 0) return '--';
+            const s = Math.floor(ms / 1000);
+            const h = Math.floor(s / 3600);
+            const m = Math.floor((s % 3600) / 60);
+            const sec = s % 60;
+            const pad = (n) => String(n).padStart(2, '0');
+            return h > 0 ? `${h}h${pad(m)}` : `${pad(m)}:${pad(sec)}`;
+        }
+
+        // ============================== GÉNÉRATION DE LA CARTE POSTALE (CANVAS HD SUR CARTE UPLOADÉE) ==============================
+        function generatePostcard(durationMs, callback) {
+            const W = 1000;
+            const H = 1400; // Format Portrait, comme la carte Midnight Blue SVG
+            const cnv = document.createElement('canvas');
+            cnv.width = W; cnv.height = H;
+            const ctx = cnv.getContext('2d');
+
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            // /!\ IMPORTANT : Place ton fichier JPG allégé
+            // dans le même dossier sur ton repo privé GitHub pour qu'il se charge ici !
+            img.src = "./gen_ve_midnight_blue_20260602_154443.jpg"; 
+
+            img.onload = () => draw(img);
+            img.onerror = () => {
+                console.warn("Fichier image introuvable. Fallback abstrait.");
+                draw(null); 
+            };
+
+            function draw(bgImg) {
+                if (bgImg) {
+                    // On dessine ta map en fond complet (cover math)
+                    const scale = Math.max(W / bgImg.width, H / bgImg.height);
+                    const w = bgImg.width * scale;
+                    const h = bgImg.height * scale;
+                    const x = (W - w) / 2;
+                    const y = (H - h) / 2;
+                    ctx.drawImage(bgImg, x, y, w, h);
+                } else {
+                    // Fallback couleur "Midnight Blue" si le fichier n'est pas chargé
+                    ctx.fillStyle = '#0a1128';
+                    ctx.fillRect(0, 0, W, H);
+                }
+
+                // --- TRACÉ DU PARCOURS ---
+                const lats = gameSteps.map(s => s.targetLat);
+                const lons = gameSteps.map(s => s.targetLon);
+                const minLat = Math.min(...lats), maxLat = Math.max(...lats);
+                const minLon = Math.min(...lons), maxLon = Math.max(...lons);
+                
+                // Marge pour centrer le parcours sur la map
+                const padX = 150;
+                const padTop = 250;
+                const padBottom = 400;
+
+                const proj = (lat, lon) => {
+                    const x = padX + ((lon - minLon) / (maxLon - minLon)) * (W - 2 * padX);
+                    // Latitude inversée (Nord en haut)
+                    const y = padTop + (1 - (lat - minLat) / (maxLat - minLat)) * (H - padTop - padBottom);
+                    return [x, y];
+                };
+
+                const points = gameSteps.map(s => proj(s.targetLat, s.targetLon));
+
+                // Tracer la ligne dorée
+                ctx.beginPath();
+                points.forEach((p, i) => {
+                    if (i === 0) ctx.moveTo(p[0], p[1]);
+                    else ctx.lineTo(p[0], p[1]);
+                });
+                ctx.strokeStyle = '#c9a14a';
+                ctx.lineWidth = 4;
+                ctx.setLineDash([12, 8]);
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                
+                // Glow doré sur la ligne
+                ctx.shadowColor = '#c9a14a';
+                ctx.shadowBlur = 10;
+                ctx.stroke();
+                
+                // Reset shadow et dash
+                ctx.shadowBlur = 0;
+                ctx.setLineDash([]);
+
+                // Tracer les points d'étape
+                points.forEach((p, i) => {
+                    ctx.fillStyle = '#0a1128';
+                    ctx.beginPath();
+                    ctx.arc(p[0], p[1], 16, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#c9a14a';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#c9a14a';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.font = 'bold 16px "JetBrains Mono", monospace';
+                    ctx.fillText(gameSteps[i].id, p[0], p[1]);
+                });
+
+                // --- TEXTES DU BAS (STYLE MINUIT & OR) ---
+                // Fond légèrement assombri en bas pour lisibilité
+                const grad = ctx.createLinearGradient(0, H - 350, 0, H);
+                grad.addColorStop(0, 'rgba(10, 17, 40, 0)');
+                grad.addColorStop(1, 'rgba(10, 17, 40, 0.95)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, H - 350, W, 350);
+
+                ctx.fillStyle = '#c9a14a';
+                ctx.textAlign = 'left';
+                
+                ctx.font = 'bold 54px "Cinzel", serif';
+                ctx.fillText("PROJET ÉCLIPSE", 80, H - 180);
+
+                ctx.font = '32px "Cormorant Garamond", serif';
+                ctx.fillStyle = '#e6dcc8';
+                ctx.fillText("Rapport de Mission de l'Ordre des Veilleurs", 80, H - 120);
+
+                ctx.font = '24px "JetBrains Mono", monospace';
+                ctx.fillStyle = '#8a8377';
+                ctx.fillText(`ÉQUIPE : ${TEAM_ID}`, 80, H - 60);
+                ctx.fillText(`TEMPS  : ${fmtDuration(durationMs)}`, 450, H - 60);
+
+                // --- SCEAU ROUGE FINAL ---
+                ctx.strokeStyle = '#b53d2a';
+                ctx.lineWidth = 5;
+                ctx.beginPath(); ctx.arc(W - 140, H - 140, 75, 0, Math.PI * 2); ctx.stroke();
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(W - 140, H - 140, 62, 0, Math.PI * 2); ctx.stroke();
+                
+                ctx.fillStyle = '#b53d2a';
+                ctx.textAlign = 'center';
+                ctx.font = 'bold 28px "Cinzel", serif';
+                ctx.fillText("PACTE", W - 140, H - 145);
+                ctx.fillText("SCELLÉ", W - 140, H - 105);
+                
+                // Trait central du sceau
+                ctx.beginPath(); ctx.moveTo(W - 190, H - 125); ctx.lineTo(W - 90, H - 125);
+                ctx.lineWidth = 1.5; ctx.stroke();
+
+                callback(cnv.toDataURL('image/png', 0.9));
+            }
+        }
+
+        function renderEndScreen() {
+            document.body.removeAttribute('data-step');
+            applyEra('cyber', { animate: lastRenderedEra !== 'cyber' });
+            lastRenderedEra = 'cyber';
+            const duration = startTimestamp ? (Date.now() - startTimestamp - pausedDuration) : 0;
+            const totalAttempts = Object.values(attemptsByStep).reduce((a,b)=>a+b, 0);
+
+            appContainer.innerHTML = `
+                <div class="view-enter end-hero">
+                    <div class="ornament"></div>
+                    <h1 class="glitch" data-testid="end-title">// SÉQUENCE TERMINÉE</h1>
+                    <p>Tu as traversé la Réforme, l'âge de la vapeur et l'ère numérique.<br>L'Ordre des Veilleurs te reconnaît, Initié.</p>
+                    <div class="stats-grid">
+                        <div class="stat-box"><div class="v">${gameSteps.length}</div><div class="k">Énigmes</div></div>
+                        <div class="stat-box"><div class="v">${fmtDuration(duration)}</div><div class="k">Durée</div></div>
+                        <div class="stat-box"><div class="v">${totalAttempts}</div><div class="k">Tentatives</div></div>
+                        <div class="stat-box"><div class="v">${gameSteps.length}</div><div class="k">Lieux visités</div></div>
+                    </div>
+
+                    <!-- PREVIEW DE LA CARTE POSTALE -->
+                    <div class="postcard-preview-container">
+                        <img id="postcard-img" src="" alt="Souvenir de Genève">
+                        <div id="postcard-loading">Génération de la carte souvenir...</div>
+                    </div>
+
+                    <div class="map-actions">
+                        <button id="btn-export-map" data-testid="btn-export-map" disabled>📥 Télécharger le souvenir</button>
+                    </div>
+                    <div class="ornament"></div>
+                    <p style="opacity:.6;font-size:.95rem">Pacte scellé · Genève · Projet Éclipse · ${TEAM_ID}</p>
+                </div>
+            `;
+
+            // Génération asynchrone pour ne pas bloquer l'UI
+            generatePostcard(duration, (dataUrl) => {
+                const imgEl = document.getElementById('postcard-img');
+                const loadEl = document.getElementById('postcard-loading');
+                const btn = document.getElementById('btn-export-map');
+                
+                imgEl.src = dataUrl;
+                imgEl.style.display = 'block';
+                loadEl.style.display = 'none';
+                
+                btn.disabled = false;
+                btn.onclick = () => {
+                    sfx('click');
+                    const dl = document.createElement('a');
+                    dl.href = dataUrl;
+                    dl.download = `Geneve-Veilleurs-${TEAM_ID}.png`;
+                    dl.click();
+                    toast("Souvenir téléchargé", "ok");
+                };
+            });
+
+            setTimeout(() => burstParticles('baroque', { cy: window.innerHeight * 0.35 }), 200);
+            setTimeout(() => burstParticles('industrial', { cy: window.innerHeight * 0.5 }), 900);
+            setTimeout(() => burstParticles('cyber', { cy: window.innerHeight * 0.65 }), 1600);
+            attachSecretAccess();
+        }
+
+        // ============================== GAME MASTER ==============================
+        async function listTeams() {
+            try {
+                const snap = await get(ref(db, 'session'));
+                const data = snap.val() || {};
+                return Object.entries(data).map(([id, info]) => ({
+                    id,
+                    step: typeof info.step === 'number' ? info.step : 0,
+                    view: info.view || 'transition'
+                }));
+            } catch (e) { return []; }
+        }
+
+        async function renderGMUI(fbStepIndex, fbView, fbHintsReleased, fbCustomHint) {
+            document.body.removeAttribute('data-step');
+            applyEra('industrial', { animate: false });
+            const isFinished = fbStepIndex >= gameSteps.length;
+            const step = isFinished ? null : gameSteps[fbStepIndex];
+
+            const viewMap = { 'transition': "Lit le briefing", 'gps': "Navigation GPS", 'enigma': "Résolution d'énigme", 'end': "Fin de partie" };
+            const viewString = viewMap[fbView] || "Inconnu";
+            const teams = await listTeams();
+
+            let html = `
+                <div class="topbar">
+                    <span class="badge-era">Console Maître</span>
+                    <span class="meta">${escapeHtml(TEAM_ID)}</span>
+                </div>
+                <h1 data-testid="gm-title">Tableau de Bord</h1>
+            `;
+
+            if (teams.length > 1) {
+                html += `<h3 style="font-size:.85rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">Équipes</h3>`;
+                teams.forEach(t => {
+                    const active = t.id === TEAM_ID;
+                    const stepLbl = t.step >= gameSteps.length ? 'Terminé' : `Étape ${t.step + 1}/${gameSteps.length}`;
+                    html += `
+                        <div class="team-row ${active ? 'active' : ''}" data-team="${escapeHtml(t.id)}">
+                            <div class="team-name">${escapeHtml(t.id)} ${active ? '●' : ''}</div>
+                            <div class="team-state">${stepLbl} · ${viewMap[t.view] || t.view}</div>
+                        </div>`;
+                });
+            }
+
+            html += `
+                <div class="card-container">
+                    <div class="card gm-card">
+                        <div class="lbl">Statut équipe</div>
+                        <div class="data">${isFinished ? 'Mission complète' : `Étape ${fbStepIndex + 1} / ${gameSteps.length}`}</div>
+                        <div class="gm-status-badge" data-testid="gm-status">${isFinished ? 'TERMINÉE' : viewString}</div>
+                    </div>
+                </div>
+            `;
+
+            if (step) {
+                const attemptsForStep = attemptsByStep[fbStepIndex] || 0;
+                html += `
+                    <div class="card-container">
+                        <div class="card gm-card">
+                            <div class="lbl">Cible / Lieu</div>
+                            <div class="data" data-testid="gm-target">${step.title}</div>
+                            <div class="lbl" style="margin-top:14px;">Texte affiché actuellement</div>
+                            <div class="data" style="font-size:.95rem;opacity:.85;">${escapeHtml(fbView === 'enigma' ? step.question : step.transitionText)}</div>
+                            ${attemptsForStep > 0 ? `<div class="lbl" style="margin-top:14px;">Tentatives sur cette étape</div><div class="answer">${attemptsForStep}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="card-container">
+                        <div class="card gm-card">
+                            <div class="lbl">Réponse attendue</div>
+                            <div class="answer" data-testid="gm-answer">${escapeHtml(decodeSecret(step.secret))}</div>
+                            ${step.alts && step.alts.length ? `<div class="lbl" style="margin-top:8px;">Variantes acceptées</div><div class="data" style="font-size:.9rem;">${step.alts.map(a => escapeHtml(decodeSecret(a))).join(' · ')}</div>` : ''}
+                        </div>
+                    </div>
+                    <h3 style="margin-top:24px;font-size:.85rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;">Indices à libérer</h3>
+                    <div class="card-container">
+                        <div class="card gm-card" data-testid="gm-hints-panel">
+                `;
+                
+                (step.hints || []).forEach((h, i) => {
+                    const released = i < fbHintsReleased;
+                    html += `
+                        <div class="gm-hint-row ${released ? 'released' : ''}">
+                            <div class="hint-content">
+                                <div class="lvl">Indice ${i + 1} ${released ? '· délivré' : ''}</div>
+                                <div>${escapeHtml(h)}</div>
+                            </div>
+                            <div style="display:flex;align-items:center;">
+                                ${released
+                                    ? `<button class="btn-secondary" data-act="lock-hint" data-idx="${i}" data-testid="btn-lock-hint-${i + 1}" style="padding:8px 12px;font-size:.7rem;">Retirer</button>`
+                                    : `<button data-act="release-hint" data-idx="${i}" data-testid="btn-release-hint-${i + 1}" style="padding:10px 14px;font-size:.7rem;">Libérer</button>`}
+                            </div>
+                        </div>`;
+                });
+                
+                html += `
+                            <div class="lbl" style="margin-top:14px;">Message personnalisé</div>
+                            <textarea id="custom-hint-input" placeholder="Indice libre pour le joueur…" data-testid="custom-hint-input">${escapeHtml(fbCustomHint || '')}</textarea>
+                            <div class="row mt-sm">
+                                <button data-act="send-custom" data-testid="btn-send-custom-hint">Envoyer</button>
+                                <button class="btn-secondary" data-act="clear-custom" data-testid="btn-clear-custom-hint">Effacer</button>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 style="margin-top:24px;font-size:.85rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;">Contrôles manuels</h3>
+                `;
+                if (fbView === 'transition') html += `<button id="btn-force-gps" class="btn-gm-action highlight" data-testid="btn-force-gps">Passer la lecture → GPS</button>`;
+                if (fbView === 'transition' || fbView === 'gps') html += `<button id="btn-force-enigma" class="btn-gm-action ${fbView === 'gps' ? 'highlight' : ''}" data-testid="btn-force-enigma">Bypass GPS → Énigme</button>`;
+                html += `<button id="btn-force-next" class="btn-gm-action ${fbView === 'enigma' ? 'highlight' : ''}" data-testid="btn-force-next">Valider l'énigme → Suite</button>`;
+            }
+
+            html += `
+                <div style="margin-top:32px;border-top:1px solid var(--border);padding-top:18px;">
+                    <button id="btn-reset" class="btn-danger" data-testid="btn-reset-game">Réinitialiser toute la partie</button>
+                    <a href="?${urlParams.get('team') ? `team=${urlParams.get('team')}` : ''}" class="back-link" data-testid="back-to-player">[ Voir l'écran joueur ]</a>
+                </div>
+            `;
+            appContainer.innerHTML = html;
+
+            appContainer.querySelectorAll('[data-team]').forEach(row => {
+                row.onclick = () => {
+                    const tid = row.getAttribute('data-team');
+                    if (tid !== TEAM_ID) window.location.href = `?mode=gm&team=${encodeURIComponent(tid)}`;
+                };
+            });
+
+            appContainer.querySelectorAll('[data-act]').forEach(el => {
+                const act = el.getAttribute('data-act');
+                const idx = parseInt(el.getAttribute('data-idx'));
+                el.addEventListener('click', () => {
+                    if (act === 'release-hint') {
+                        writeSession({ hintsReleased: Math.max(fbHintsReleased, idx + 1) });
+                        toast(`Indice ${idx + 1} envoyé au joueur`, 'ok');
+                    } else if (act === 'lock-hint') {
+                        writeSession({ hintsReleased: idx });
+                        toast(`Indice retiré`, '');
+                    } else if (act === 'send-custom') {
+                        const txt = document.getElementById('custom-hint-input').value.trim();
+                        writeSession({ customHint: txt });
+                        toast(txt ? 'Message envoyé' : 'Message effacé', 'ok');
+                    } else if (act === 'clear-custom') {
+                        document.getElementById('custom-hint-input').value = '';
+                        writeSession({ customHint: "" });
+                        toast('Message effacé', '');
+                    }
+                });
+            });
+
+            const bForceGps = document.getElementById('btn-force-gps');
+            if (bForceGps) bForceGps.onclick = () => { if (confirm("Envoyer le joueur en mode GPS ?")) writeSession({ view: 'gps' }); };
+            const bForceEnig = document.getElementById('btn-force-enigma');
+            if (bForceEnig) bForceEnig.onclick = () => { if (confirm("Bypasser le GPS et basculer sur l'énigme ?")) writeSession({ view: 'enigma' }); };
+            const bForceNext = document.getElementById('btn-force-next');
+            if (bForceNext) bForceNext.onclick = () => {
+                if (confirm("Valider l'énigme et passer à l'étape suivante ?")) {
+                    writeSession({ step: fbStepIndex + 1, view: 'transition', hintsReleased: 0, customHint: "" });
+                }
+            };
+            const bReset = document.getElementById('btn-reset');
+            if (bReset) bReset.onclick = () => {
+                if (confirm("DANGER : Réinitialiser toute la partie ?")) {
+                    localStorage.removeItem('escapeStartTs');
+                    localStorage.removeItem('escapeAttempts');
+                    localStorage.removeItem('escapePausedDuration');
+                    attemptsByStep = {}; pausedDuration = 0;
+                    writeSession({
+                        step: 0, view: 'transition', hintsReleased: 0, customHint: "",
+                        attemptsByStep: null
+                    });
+                    toast("Partie réinitialisée", 'ok');
+                }
+            };
+        }
+
+        // ============================== BOOT ==============================
+        async function runBootSequence() {
+            const boot = document.getElementById('bootScreen');
+            const skipBtn = document.getElementById('bootSkip');
+            if (sessionStorage.getItem('hasBooted') || currentStepIndex > 0 || isGMSession) {
+                boot.style.display = 'none'; return;
+            }
+            const output = document.getElementById('bootOutput');
+            const lines = [
+                "> INITIALIZING ECLIPSE PROTOCOL...",
+                "> BYPASSING GENEVA FIREWALL...",
+                "> INJECTING PAYLOAD TO MAINFRAME...",
+                "> SYNCING GPS SATELLITES...",
+                "> DECRYPTING ERA_01 : BAROQUE",
+                "> ACCESS GRANTED."
+            ];
+            let skipped = false;
+            const skipBoot = () => {
+                if (skipped) return;
+                skipped = true;
+                boot.style.opacity = '0';
+                sessionStorage.setItem('hasBooted', 'true');
+                setTimeout(() => boot.style.display = 'none', 400);
+            };
+            skipBtn.onclick = skipBoot;
+            for (let line of lines) {
+                if (skipped) break;
+                const el = document.createElement('div');
+                el.className = 'boot-line';
+                el.textContent = line;
+                output.appendChild(el);
+                try { playTone(800 + Math.random()*1000, 0.05, 'square', 0.05); } catch(e){}
+                await new Promise(r => setTimeout(r, 280 + Math.random() * 380));
+            }
+            if (!skipped) {
+                await new Promise(r => setTimeout(r, 500));
+                skipBoot();
+            }
+        }
+
+        // ============================== OFFLINE ==============================
+        function updateOnlineUI() {
+            const banner = document.getElementById('offlineBanner');
+            const offline = !isOnline || !firebaseConnected;
+            banner.classList.toggle('show', offline);
+        }
+        window.addEventListener('online', () => { isOnline = true; updateOnlineUI(); toast("De retour en ligne", "ok"); });
+        window.addEventListener('offline', () => { isOnline = false; updateOnlineUI(); toast("Mode hors-ligne", "error"); });
+
+        // ============================== INIT ==============================
+        function init() {
+            runBootSequence();
+
+            if (!startTimestamp && !isGMSession) {
+                startTimestamp = Date.now();
+                localStorage.setItem('escapeStartTs', startTimestamp);
+            }
+
+            if (isGMSession) {
+                let gmAuth = sessionStorage.getItem('gmAuth');
+                if (gmAuth !== '1') {
+                    const attempt = prompt("Accès restreint. Entrez la clé d'identification :");
+                    if (attempt && verifyCode(attempt, ADMIN_TOKEN)) {
+                        sessionStorage.setItem('gmAuth', '1');
+                    } else {
+                        alert("Accès refusé.");
+                        window.location.href = "?"; return;
+                    }
+                }
+            }
+
+            onValue(ref(db, '.info/connected'), (snap) => {
+                firebaseConnected = !!snap.val();
+                updateOnlineUI();
+            });
+
+            onValue(ref(db, `session/${TEAM_ID}`), (snapshot) => {
+                const data = snapshot.val() || {};
+                const fbStep = typeof data.step === 'number' ? data.step : 0;
+                const fbView = data.view || 'transition';
+                const fbHints = typeof data.hintsReleased === 'number' ? data.hintsReleased : 0;
+                const fbCustom = data.customHint || "";
+                const fbAttempts = data.attemptsByStep || {};
+                
+                Object.keys(fbAttempts).forEach(k => {
+                    if ((fbAttempts[k] || 0) > (attemptsByStep[k] || 0)) attemptsByStep[k] = fbAttempts[k];
+                });
+
+                if (isGMSession) {
+                    lastFbHintsReleased = fbHints;
+                    lastFbCustomHint = fbCustom;
+                    renderGMUI(fbStep, fbView, fbHints, fbCustom);
+                } else {
+                    const viewRank = { 'transition': 0, 'gps': 1, 'enigma': 2, 'end': 3 };
+                    let needRender = false;
+                    if (fbStep !== currentStepIndex) {
+                        if (fbStep === 0 && fbView === 'transition' && (currentStepIndex > 0 || currentView !== 'transition')) {
+                            localStorage.removeItem('escapeStartTs');
+                            localStorage.removeItem('escapeAttempts');
+                            localStorage.removeItem('escapePausedDuration');
+                            attemptsByStep = {}; pausedDuration = 0;
+                            startTimestamp = Date.now();
+                            localStorage.setItem('escapeStartTs', startTimestamp);
+                        }
+                        currentStepIndex = fbStep;
+                        currentView = fbView;
+                        needRender = true;
+                    } else if ((viewRank[fbView] ?? 0) !== (viewRank[currentView] ?? 0)) {
+                        currentView = fbView;
+                        needRender = true;
+                    } else if (fbHints !== lastFbHintsReleased || fbCustom !== lastFbCustomHint) {
+                        if (fbHints > lastFbHintsReleased || (fbCustom && fbCustom !== lastFbCustomHint)) {
+                            flashHintReceived();
+                        }
+                        if (!fbCustom && lastFbCustomHint) {
+                            const c = document.querySelector('[data-testid="hint-custom"]');
+                            if (c) {
+                                c.classList.add('exit');
+                                setTimeout(() => { needRender = true; renderPlayerUI({ hintsReleased: fbHints, customHint: fbCustom }); }, 400);
+                                lastFbHintsReleased = fbHints;
+                                lastFbCustomHint = fbCustom;
+                                return;
+                            }
+                        }
+                        needRender = true;
+                    }
+
+                    lastFbHintsReleased = fbHints;
+                    lastFbCustomHint = fbCustom;
+
+                    if (needRender) {
+                        localStorage.setItem('escapeLocalStep', currentStepIndex);
+                        localStorage.setItem('escapeLocalView', currentView);
+                        if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+                        if (currentStepIndex >= gameSteps.length) renderEndScreen();
+                        else renderPlayerUI({ hintsReleased: fbHints, customHint: fbCustom });
+                    }
+                }
+            });
+
+            if (!isGMSession) {
+                writeSession({ step: currentStepIndex, view: currentView });
+                renderPlayerUI({ hintsReleased: 0, customHint: "" });
+            }
+
+            const unlockAudio = () => {
+                ensureAudio();
+                document.removeEventListener('touchstart', unlockAudio);
+                document.removeEventListener('click', unlockAudio);
+            };
+            document.addEventListener('touchstart', unlockAudio, { once: true });
+            document.addEventListener('click', unlockAudio, { once: true });
+        }
+
+        init();
     </script>
 </body>
-</html>```
-
-```
+</html>
