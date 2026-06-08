@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <!-- Meta viewport stricte pour empêcher le zoom non désiré sur iPhone et figer l'écran -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Terminal Hacking - Tour de Bel-Air</title>
+    <title>Terminal Hacking - Tour du Molard</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -202,8 +202,8 @@
 
     <script>
         // --- Configuration des textes ---
-        const introText = "CONNEXION AU MAINFRAME DES VEILLEURS...\nTOUR DE BEL-AIR. IDENTIFICATION REQUISE.\nRÉPONDEZ À L'ÉNIGME POUR OBTENIR LA CLÉ D'ACCÈS.";
-        const riddleText = "Je suis l'année où cette tour de béton a touché le ciel pour la première fois. Qui suis-je ?";
+        const introText = "CONNEXION AU MAINFRAME DES VEILLEURS...\nTOUR DU MOLARD, GENÈVE. IDENTIFICATION REQUISE.\nRÉPONDEZ À L'ÉNIGME POUR OBTENIR LA CLÉ D'ACCÈS.";
+        const riddleText = "Ancienne gardienne militaire protégeant le port, je fus reconstruite et ornée de mon horloge en une année précise. Quelle est cette année ?";
         
         // --- COUCHE DE SÉCURITÉ ANTI-TRICHE (Obfuscation) ---
         // Algorithme de hachage pour masquer la réponse attendue dans le code source
@@ -212,7 +212,9 @@
             for(let i = 0; i < s.length; i++) h = Math.imul(31, h) + s.charCodeAt(i) | 0;
             return h;
         }
-        const _target = 1512508; // L'empreinte de la bonne réponse
+        
+        // Empreinte correspondant à la réponse "1591"
+        const _target = 1512508; 
         
         // Clé de victoire masquée (Tableau ASCII Hexadécimal)
         const _secret = [0x52, 0x4F, 0x59, 0x41, 0x55, 0x4D, 0x45, 0x5F, 0x4F, 0x53]; 
